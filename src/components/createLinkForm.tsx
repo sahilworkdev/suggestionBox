@@ -21,6 +21,7 @@ export default function CreateLinkForm() {
     link: string;
     createdAt: string;
   }>(null);
+const baseUrl = 'http://localhost:3000/receive'
 
   const generateLink = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,7 +40,7 @@ export default function CreateLinkForm() {
     setPending(true);
     try {
       const id = `${Date.now()}-${Math.random().toString(36).substring(2, 10)}`;
-      const link = `${window.location.origin}/suggestion/${id}`;
+      const link = `${baseUrl}/${id}`;
       const newEntry = {
         id,
         topic: topic.trim(),

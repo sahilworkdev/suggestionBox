@@ -47,7 +47,7 @@ export default function SuggestionsTable() {
           </TableHeader>
           <TableBody>
             {suggestions?.map((suggestion: Suggestion) => (
-              <TableRow key={1}>
+              <TableRow key={suggestion?.id}>
                 <TableCell className="font-medium text-left p-2 md:p-4">
                   <Link href={`/dashboard/${suggestion?.id}`} className="block">
                     <span className="sm:hidden">
