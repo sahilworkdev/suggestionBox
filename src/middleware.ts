@@ -13,10 +13,10 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith(route)
   );
 
-  // // Redirect to home if trying to access protected route without auth
-  // if (isProtectedRoute && !userAccount) {
-  //   return NextResponse.redirect(new URL("/", request.url));
-  // }
+  // Redirect to home if trying to access protected route without auth
+  if (isProtectedRoute && !userAccount) {
+    return NextResponse.redirect(new URL("/", request.url));
+  }
 
   return NextResponse.next();
 }

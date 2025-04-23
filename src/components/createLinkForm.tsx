@@ -91,7 +91,7 @@ const baseUrl = 'http://localhost:3000/receive'
 
   return (
     <>
-      {!latestSuggestion && (
+    
         <form className="flex flex-col justify-start items-start gap-4 sm:gap-6 w-full max-w-xl mx-auto">
           <div className="flex flex-col items-start gap-2 w-full">
             <Label htmlFor="topic" className="text-lg font-medium">
@@ -137,8 +137,8 @@ const baseUrl = 'http://localhost:3000/receive'
             </Button>
           </div>
         </form>
-      )}
-      {latestSuggestion && (
+
+      {/* {latestSuggestion && (
         <div className="w-full flex flex-col gap-4 max-w-xl mx-auto items-center">
           <div className="relative mt-8 p-4 border rounded bg-transparent  w-full max-w-xl mx-auto space-y-2">
             <ShineBorder shineColor={["#A07CFE", "#FE8FB5", "#FFBE7B"]} />
@@ -168,7 +168,7 @@ const baseUrl = 'http://localhost:3000/receive'
           </div>
           <Button className="w-[120px] cursor-pointer"   onClick={() => setLatestSuggestion(null)} >Create New</Button>
         </div>
-      )}
+      )} */}
     </>
   );
 }
