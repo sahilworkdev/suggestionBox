@@ -24,7 +24,7 @@ export default function Header() {
   useEffect(() => {
     const cookie = getCookie("userAccount") as string | null;
     setUser(cookie);
-  }, [user]);
+  }, []);
 
   const disconnectWallet = () => {
     deleteCookie("userAccount");

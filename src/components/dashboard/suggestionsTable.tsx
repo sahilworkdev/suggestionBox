@@ -20,8 +20,9 @@ type Suggestion = {
   status: string;
 };
 export default function SuggestionsTable() {
-  const suggestions = JSON.parse(localStorage.getItem("suggestions") || "[]");
+  // const suggestions = JSON.parse(localStorage.getItem("suggestions") || "[]");
   // console.log(">>>>", suggestions);
+
 
   return (
     <div className="w-full container mx-auto px-4">
