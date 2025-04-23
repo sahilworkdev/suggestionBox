@@ -3,9 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-
 import { Check, Copy, LoaderCircle } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { ShineBorder } from "./magicui/shine-border";
 import { ethers } from "ethers";
@@ -24,6 +23,12 @@ export default function CreateLinkForm() {
   const [topic, setTopic] = useState("");
   const [desc, setDesc] = useState("");
   const [privacy, setPrivacy] = useState("private");
+  const [latestSuggestion, setLatestSuggestion] = useState<{
+    topic: string;
+    description: string;
+    isPrivate: boolean;
+    link: string;
+  } | null>(null);
 
   const [copied, setCopied] = useState(false);
 
@@ -73,6 +78,12 @@ export default function CreateLinkForm() {
 
       const tx = await contract.createLink(linkIdBytes32, isPrivate);
       await tx.wait();
+      setLatestSuggestion({
+        topic: topic.trim(),
+        description: desc.trim(),
+        isPrivate,
+        link: fullLink,
+      });
 
       toast.success("Suggestion Link created successfully!");
       setTopic("");
@@ -87,74 +98,76 @@ export default function CreateLinkForm() {
 
   return (
     <>
-      <form className="flex flex-col justify-start items-start gap-4 sm:gap-6 w-full max-w-xl mx-auto">
-        <div className="flex flex-col items-start gap-2 w-full">
-          <Label htmlFor="topic" className="text-lg font-medium">
-            Topic
-          </Label>
-          <Input
-            placeholder="Enter topic..."
-            name="topic"
-            id="topic"
-            className="flex-1 w-full px-4 py-2"
-            value={topic}
-            onChange={(e) => setTopic(e.target.value)}
-          />
-        </div>
-        <div className="flex flex-col items-start gap-2 w-full">
-          <Label htmlFor="desc" className="text-lg font-medium">
-            Description
-          </Label>
-          <Textarea
-            onChange={(e) => setDesc(e.target.value)}
-            value={desc}
-            placeholder="Enter description..."
-            name="desc"
-            id="desc"
-            className="flex-1 w-full px-4 py-2"
-          />
-        </div>
-        <div className="flex flex-col items-start gap-2 w-full">
-          <Label htmlFor="privacy" className="text-lg font-medium">
-            Choose who can see the suggestions
-          </Label>
-          <RadioGroup
-            id="privacy"
-            name="privacy"
-            defaultValue="private"
-            value={privacy}
-            onValueChange={setPrivacy}
-          >
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="private" id="r1" />
-              <Label htmlFor="r1">Only Me</Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="public" id="r2" />
-              <Label htmlFor="r2">Anyone with the suggestion link</Label>
-            </div>
-          </RadioGroup>
-        </div>
+      {!latestSuggestion && (
+        <form className="flex flex-col justify-start items-start gap-4 sm:gap-6 w-full max-w-xl mx-auto">
+          <div className="flex flex-col items-start gap-2 w-full">
+            <Label htmlFor="topic" className="text-lg font-medium">
+              Topic
+            </Label>
+            <Input
+              placeholder="Enter topic..."
+              name="topic"
+              id="topic"
+              className="flex-1 w-full px-4 py-2"
+              value={topic}
+              onChange={(e) => setTopic(e.target.value)}
+            />
+          </div>
+          <div className="flex flex-col items-start gap-2 w-full">
+            <Label htmlFor="desc" className="text-lg font-medium">
+              Description
+            </Label>
+            <Textarea
+              onChange={(e) => setDesc(e.target.value)}
+              value={desc}
+              placeholder="Enter description..."
+              name="desc"
+              id="desc"
+              className="flex-1 w-full px-4 py-2"
+            />
+          </div>
+          <div className="flex flex-col items-start gap-2 w-full">
+            <Label htmlFor="privacy" className="text-lg font-medium">
+              Choose who can see the suggestions
+            </Label>
+            <RadioGroup
+              id="privacy"
+              name="privacy"
+              defaultValue="private"
+              value={privacy}
+              onValueChange={setPrivacy}
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="private" id="r1" />
+                <Label htmlFor="r1">Only Me</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="public" id="r2" />
+                <Label htmlFor="r2">Anyone with the suggestion link</Label>
+              </div>
+            </RadioGroup>
+          </div>
 
-        <div className="w-full">
-          <Button
-            className={"relative w-full font-semibold"}
-            onClick={generateLink}
-            type="button"
-          >
-            <span className={pending ? "text-transparent" : ""}>
-              Generate Link
-            </span>
-            {pending && (
-              <span className="flex justify-center items-center absolute w-full h-full text-slate-400">
-                <LoaderCircle className="animate-spin" />
+          <div className="w-full">
+            <Button
+              className={"relative w-full font-semibold"}
+              onClick={generateLink}
+              type="button"
+            >
+              <span className={pending ? "text-transparent" : ""}>
+                Generate Link
               </span>
-            )}
-          </Button>
-        </div>
-      </form>
+              {pending && (
+                <span className="flex justify-center items-center absolute w-full h-full text-slate-400">
+                  <LoaderCircle className="animate-spin" />
+                </span>
+              )}
+            </Button>
+          </div>
+        </form>
+      )}
 
-      {/* {latestSuggestion && (
+      {latestSuggestion && (
         <div className="w-full flex flex-col gap-4 max-w-xl mx-auto items-center">
           <div className="relative mt-8 p-4 border rounded bg-transparent  w-full max-w-xl mx-auto space-y-2">
             <ShineBorder shineColor={["#A07CFE", "#FE8FB5", "#FFBE7B"]} />
@@ -182,9 +195,14 @@ export default function CreateLinkForm() {
               </div>
             </div>
           </div>
-          <Button className="w-[120px] cursor-pointer"   onClick={() => setLatestSuggestion(null)} >Create New</Button>
+          <Button
+            className="w-[120px] cursor-pointer"
+            onClick={() => setLatestSuggestion(null)}
+          >
+            Create New
+          </Button>
         </div>
-      )} */}
+      )}
     </>
   );
 }
