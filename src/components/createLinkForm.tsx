@@ -168,39 +168,29 @@ export default function CreateLinkForm() {
       )}
 
       {latestSuggestion && (
-        <div className="w-full flex flex-col gap-4 max-w-xl mx-auto items-center">
-          <div className="relative mt-8 p-4 border rounded bg-transparent  w-full max-w-xl mx-auto space-y-2">
-            <ShineBorder shineColor={["#A07CFE", "#FE8FB5", "#FFBE7B"]} />
-            <h3 className="text-xl font-semibold text-center mb-4">
-              Share the below link to start recieving suggestions
-            </h3>
-            <div className="w-full flex flex-col justify-center items-center gap-1 mb-2">
-              <p className="font-semibold text-lg text-[#FFBE7B]">
-                {latestSuggestion.topic}
-              </p>
-              <p className="text-sm font-light">
-                {latestSuggestion.description}
-              </p>
-            </div>
+        <div className="relative mt-8 p-4 border rounded bg-transparent  w-full max-w-xl mx-auto space-y-2">
+          <ShineBorder shineColor={["#A07CFE", "#FE8FB5", "#FFBE7B"]} />
+          <h3 className="text-xl font-semibold text-center mb-4">
+            Share the below link to start recieving suggestions
+          </h3>
+          <div className="w-full flex flex-col justify-center items-center gap-1 mb-2">
+            <p className="font-semibold text-lg text-[#FFBE7B]">
+              {latestSuggestion.topic}
+            </p>
+            <p className="text-sm font-light">{latestSuggestion.description}</p>
+          </div>
 
-            <div className="w-full flex justify-center items-center gap-1">
-              <div className="p-[9px] bg-zinc-800 rounded">
-                {latestSuggestion.link}
-              </div>
-              <div
-                className="border border-zinc-800 text-zinc-600 p-2 rounded"
-                onClick={() => handleCopyLink(latestSuggestion.link)}
-              >
-                {copied ? <Check /> : <Copy />}
-              </div>
+          <div className="w-full flex justify-center items-center gap-1">
+            <div className="p-[9px] bg-zinc-800 rounded">
+              {latestSuggestion.link}
+            </div>
+            <div
+              className="border border-zinc-800 text-zinc-600 p-2 rounded"
+              onClick={() => handleCopyLink(latestSuggestion.link)}
+            >
+              {copied ? <Check /> : <Copy />}
             </div>
           </div>
-          <Button
-            className="w-[120px] cursor-pointer"
-            onClick={() => setLatestSuggestion(null)}
-          >
-            Create New
-          </Button>
         </div>
       )}
     </>

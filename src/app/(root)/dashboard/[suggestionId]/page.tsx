@@ -1,3 +1,5 @@
+"use client";
+import { contractABI } from "@/abi";
 import { Badge } from "@/components/ui/badge";
 import {
   Breadcrumb,
@@ -8,8 +10,46 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { cn } from "@/lib/utils";
+import { BrowserProvider, Contract } from "ethers";
+import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function SuggestionPage() {
+  const { suggestionId } = useParams();
+  const [suggestion, setSuggestion] = useState<{
+    isActive: boolean;
+    isDeleted: boolean;
+    isPrivate: boolean;
+    feedbackCounts: number;
+  } | null>(null);
+  const contractAddress = String(process.env.NEXT_PUBLIC_CONTRACT_ADDRESS);
+  const fetchSuggestionById = async () => {
+    try {
+      if (!window.ethereum || !suggestionId) return;
+
+      const provider = new BrowserProvider(window.ethereum);
+      const contract = new Contract(contractAddress, contractABI, provider);
+
+      const info = await contract.getLinkInfo(suggestionId);
+      console.log("Fetched Link Info:", info);
+
+      setSuggestion({
+        isActive: info[0],
+        isDeleted: info[1],
+        isPrivate: info[2],
+        feedbackCounts: info[3],
+      });
+    } catch (err) {
+      console.error("Error fetching link info:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchSuggestionById();
+  }, []);
+
+  console.log(suggestion);
+
   return (
     <div className="container mx-auto py-10">
       <div className="w-full px-4 mb-4">
@@ -32,23 +72,19 @@ export default function SuggestionPage() {
           <p className="text-2xl font-bold">{"Feedback Name"}</p>
           <Badge
             className={cn(
-              "capitalize", "bg-yellow-500"
-            //   feedbacks[0]?.status === "active"
-            //     ? "bg-yellow-500"
-            //     : "bg-gray-500"
+              "capitalize",
+              suggestion?.isActive ? "bg-yellow-500" : "bg-gray-500"
             )}
           >
-            {/* {feedbacks[0]?.status} */}
-            Active
+            {suggestion?.isActive ? "Active" : "Inactive"}
           </Badge>
           <Badge
             className={cn(
-              "capitalize", "bg-red-500"
-            //   feedbacks[0]?.privacy === "public" ? "bg-green-500" : "bg-red-500" 
+              "capitalize",
+              suggestion?.isPrivate ? "bg-red-500" : "bg-green-500"
             )}
           >
-            {/* {feedbacks[0]?.privacy} */}
-            Public
+            {suggestion?.isPrivate ? "Private" : "Public"}
           </Badge>
         </div>
         {/* <div className="flex items-center gap-2">

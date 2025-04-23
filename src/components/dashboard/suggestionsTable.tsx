@@ -12,6 +12,9 @@ import {
 import { Badge } from "../ui/badge";
 import { PlusCircle, Trash2 } from "lucide-react";
 import { Button } from "../ui/button";
+import { BrowserProvider, Contract } from "ethers";
+import { contractABI } from "@/abi";
+import { useEffect, useState } from "react";
 
 type Suggestion = {
   id: string;
@@ -20,9 +23,39 @@ type Suggestion = {
   status: string;
 };
 export default function SuggestionsTable() {
-  // const suggestions = JSON.parse(localStorage.getItem("suggestions") || "[]");
-  // console.log(">>>>", suggestions);
+  const [links, setLinks] = useState<any[]>([]);
+  const contractAddress = String(process.env.NEXT_PUBLIC_CONTRACT_ADDRESS);
+  const fetchUserLinks = async () => {
+    try {
+      if (!window.ethereum) return;
 
+      const provider = new BrowserProvider(window.ethereum);
+      const signer = await provider.getSigner();
+      const userAddress = await signer.getAddress();
+      const contract = new Contract(contractAddress, contractABI, provider);
+
+      const linkIds: string[] = await contract.getLinksByCreator(userAddress);
+      const metadataMap = JSON.parse(
+        localStorage.getItem("linkMetadata") || "{}"
+      );
+
+      const linksWithDetails = linkIds.map((id) => ({
+        id,
+        ...metadataMap[id],
+      }));
+
+      return linksWithDetails || [];
+    } catch (err) {
+      console.error("Error fetching links:", err);
+      return [];
+    }
+  };
+
+  useEffect(() => {
+    fetchUserLinks().then((links) => setLinks(links || []));
+  }, []);
+
+  console.log(">>>>>", links);
 
   return (
     <div className="w-full container mx-auto px-4">
@@ -43,11 +76,11 @@ export default function SuggestionsTable() {
               <TableHead className="p-2 md:p-4">Name</TableHead>
               <TableHead className="p-2 md:p-4 text-center">Received</TableHead>
               <TableHead className="p-2 md:p-4 text-center">Status</TableHead>
-              {/* <TableHead className="p-2 md:p-4 text-center">Privacy</TableHead> */}
+              <TableHead className="p-2 md:p-4 text-center">Privacy</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {suggestions?.map((suggestion: Suggestion) => (
+            {links?.map((suggestion: Suggestion) => (
               <TableRow key={suggestion?.id}>
                 <TableCell className="font-medium text-left p-2 md:p-4">
                   <Link href={`/dashboard/${suggestion?.id}`} className="block">
@@ -68,7 +101,7 @@ export default function SuggestionsTable() {
                 </TableCell>
                 <TableCell className="font-medium p-0">
                   <Link
-                    href={`/dashboard/chats/${suggestion?.id}`}
+                    href={`/dashboard/${suggestion?.id}`}
                     className="block p-2 md:p-4 capitalize"
                   >
                     {suggestion?.topic}
@@ -94,6 +127,20 @@ export default function SuggestionsTable() {
                     //   )}
                     >
                       {/* {feedback?.status} */} Active
+                    </Badge>
+                  </Link>
+                </TableCell>
+                <TableCell className="text-center p-0">
+                  <Link href={`/dashboard/#`} className="block p-2 md:p-4">
+                    <Badge
+                    //   className={cn(
+                    //     "capitalize",
+                    //     feedback?.status === "active"
+                    //       ? "bg-yellow-500"
+                    //       : "bg-gray-500"
+                    //   )}
+                    >
+                      {/* {feedback?.status} */} Public
                     </Badge>
                   </Link>
                 </TableCell>
