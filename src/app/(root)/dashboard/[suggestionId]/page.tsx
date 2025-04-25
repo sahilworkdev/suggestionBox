@@ -9,20 +9,27 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { cn } from "@/lib/utils";
-import { BrowserProvider, Contract } from "ethers";
+import { cn, decryptFromBytes } from "@/lib/utils";
+import { BrowserProvider, Contract, ethers } from "ethers";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
+
+import { getCookie } from "cookies-next";
 
 export default function SuggestionPage() {
   const { suggestionId } = useParams();
   const [suggestion, setSuggestion] = useState<{
+    // creator: string;
+    topic: string;
+    description: string;
     isActive: boolean;
-    isDeleted: boolean;
     isPrivate: boolean;
-    feedbackCounts: number;
+    feedbackCount: number;
   } | null>(null);
   const contractAddress = String(process.env.NEXT_PUBLIC_CONTRACT_ADDRESS);
+  const secretKey = String(getCookie("userAccount"));
+ 
+
   const fetchSuggestionById = async () => {
     try {
       if (!window.ethereum || !suggestionId) return;
@@ -30,14 +37,23 @@ export default function SuggestionPage() {
       const provider = new BrowserProvider(window.ethereum);
       const contract = new Contract(contractAddress, contractABI, provider);
 
-      const info = await contract.getLinkInfo(suggestionId);
-      console.log("Fetched Link Info:", info);
+      const info = await contract.getFullLinkInfo(suggestionId);
+      console.log("Contract Info:", info);
+
+      const encryptedTopicHex = info[1];
+      const encryptedDescHex = info[2];
+
+      const decryptedTopic = decryptFromBytes(secretKey,encryptedTopicHex);
+      const decryptedDesc = decryptFromBytes(secretKey, encryptedDescHex);
+
+      console.log("Decrypted Topic:", decryptedTopic);
 
       setSuggestion({
-        isActive: info[0],
-        isDeleted: info[1],
-        isPrivate: info[2],
-        feedbackCounts: info[3],
+        topic: decryptedTopic,
+        description: decryptedDesc,
+        isActive: info[3],
+        isPrivate: info[4],
+        feedbackCount: Number(info[5]),
       });
     } catch (err) {
       console.error("Error fetching link info:", err);
@@ -48,7 +64,7 @@ export default function SuggestionPage() {
     fetchSuggestionById();
   }, []);
 
-  console.log(suggestion);
+  console.log(">>>", suggestion);
 
   return (
     <div className="container mx-auto py-10">
@@ -62,14 +78,14 @@ export default function SuggestionPage() {
             <BreadcrumbItem>Dashboard</BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbPage>Suggestion Name</BreadcrumbPage>
+              <BreadcrumbPage>{suggestion?.topic}</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
       </div>
       <div className="w-full flex flex-col md:flex-row justify-between items-start md:items-center gap-2 md:gap-0 my-4 px-4">
         <div className="flex items-center gap-4">
-          <p className="text-2xl font-bold">{"Feedback Name"}</p>
+          <p className="text-2xl font-bold">{suggestion?.topic}</p>
           <Badge
             className={cn(
               "capitalize",
@@ -87,11 +103,15 @@ export default function SuggestionPage() {
             {suggestion?.isPrivate ? "Private" : "Public"}
           </Badge>
         </div>
+        {/* <div className="text-sm text-wrap w-full">{suggestion?.description}</div> */}
         {/* <div className="flex items-center gap-2">
           <ChangePrivacy feedback={feedbacks[0]} />
           <ChangeStatus feedback={feedbacks[0]} />
           <MoreOptions feedbackId={feedbackId} />
         </div> */}
+      </div>
+      <div className="text-sm text-wrap w-full px-4">
+        {suggestion?.description}
       </div>
 
       {/* Link Section */}

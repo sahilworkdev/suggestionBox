@@ -11,6 +11,9 @@ import { ethers } from "ethers";
 import { BrowserProvider, Contract } from "ethers";
 import { contractABI } from "@/abi";
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
+import CryptoJS from "crypto-js";
+import { getCookie } from "cookies-next";
+import { encryptToBytes } from "@/lib/utils";
 
 declare global {
   interface Window {
@@ -42,7 +45,17 @@ export default function CreateLinkForm() {
     }, 2000);
   };
   const contractAddress = String(process.env.NEXT_PUBLIC_CONTRACT_ADDRESS);
-  // const contractABI = String(process.env.NEXT_PUBLIC_CONTRACT_ABI);
+
+  const secretKey = String(getCookie("userAccount"));
+  // console.log(">>>>s", secretKey);
+
+  // const encryptToBytes = (text: string): string => {
+  //   const encrypted = CryptoJS.AES.encrypt(text, String(secretKey)).toString();
+  //   return encrypted;
+  // };
+
+  // const namee = "sahil";
+  // console.log(encryptToBytes(namee));
 
   const generateLink = async () => {
     if (!window.ethereum) {
@@ -72,17 +85,38 @@ export default function CreateLinkForm() {
         .toString(36)
         .substring(2, 10)}`;
       const fullLink = `${baseUrl}/${rawId}`;
-      const linkIdBytes32 = ethers.keccak256(ethers.toUtf8Bytes(rawId));
-
+      console.log(">>>", fullLink);
+      const linkIdBytes = new TextEncoder().encode(
+        encryptToBytes(secretKey, fullLink)
+      );
+      const encryptedTopicBytes = new TextEncoder().encode(
+        encryptToBytes(secretKey, topic.trim())
+      );
+      const encryptedDescBytes = new TextEncoder().encode(
+        encryptToBytes(secretKey, desc.trim())
+      );
       const isPrivate = privacy === "private";
 
-      const tx = await contract.createLink(linkIdBytes32, isPrivate);
+      console.log(
+        linkIdBytes,
+        encryptedTopicBytes,
+        encryptedDescBytes,
+        isPrivate
+      );
+      const tx = await contract.createLink(
+        linkIdBytes,
+        encryptedTopicBytes,
+        encryptedDescBytes,
+        isPrivate
+      );
       await tx.wait();
+      
+
       setLatestSuggestion({
         topic: topic.trim(),
         description: desc.trim(),
         isPrivate,
-        link: fullLink,
+        link: `${baseUrl}/${linkIdBytes}`,
       });
 
       toast.success("Suggestion Link created successfully!");

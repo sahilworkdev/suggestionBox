@@ -341,6 +341,16 @@ export const contractABI = [
         type: "bytes",
       },
       {
+        internalType: "bytes",
+        name: "_topic",
+        type: "bytes",
+      },
+      {
+        internalType: "bytes",
+        name: "_topicDescription",
+        type: "bytes",
+      },
+      {
         internalType: "bool",
         name: "_isPrivate",
         type: "bool",
@@ -487,6 +497,84 @@ export const contractABI = [
         name: "_linkId",
         type: "bytes32",
       },
+      {
+        internalType: "address",
+        name: "submitter",
+        type: "address",
+      },
+    ],
+    name: "getFeedbackDetailsBySubmitter",
+    outputs: [
+      {
+        internalType: "bytes[]",
+        name: "contents",
+        type: "bytes[]",
+      },
+      {
+        internalType: "uint256[]",
+        name: "timestamps",
+        type: "uint256[]",
+      },
+      {
+        internalType: "uint256[]",
+        name: "feedbackIds",
+        type: "uint256[]",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "bytes32",
+        name: "_linkId",
+        type: "bytes32",
+      },
+    ],
+    name: "getFullLinkInfo",
+    outputs: [
+      {
+        internalType: "address",
+        name: "creator",
+        type: "address",
+      },
+      {
+        internalType: "bytes",
+        name: "topic",
+        type: "bytes",
+      },
+      {
+        internalType: "bytes",
+        name: "topicDescription",
+        type: "bytes",
+      },
+      {
+        internalType: "bool",
+        name: "isActive",
+        type: "bool",
+      },
+      {
+        internalType: "bool",
+        name: "isPrivate",
+        type: "bool",
+      },
+      {
+        internalType: "uint256",
+        name: "feedbackCount",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "bytes32",
+        name: "_linkId",
+        type: "bytes32",
+      },
     ],
     name: "getLinkFeedbackDetails",
     outputs: [
@@ -536,27 +624,17 @@ export const contractABI = [
         type: "bytes32",
       },
     ],
-    name: "getLinkInfo",
+    name: "getLinkTopic",
     outputs: [
       {
-        internalType: "bool",
-        name: "isActive",
-        type: "bool",
+        internalType: "bytes",
+        name: "topic",
+        type: "bytes",
       },
       {
-        internalType: "bool",
-        name: "isDeleted",
-        type: "bool",
-      },
-      {
-        internalType: "bool",
-        name: "isPrivate",
-        type: "bool",
-      },
-      {
-        internalType: "uint256",
-        name: "feedbackCount",
-        type: "uint256",
+        internalType: "bytes",
+        name: "topicDescription",
+        type: "bytes",
       },
     ],
     stateMutability: "view",
@@ -640,6 +718,21 @@ export const contractABI = [
         internalType: "bytes32",
         name: "linkId",
         type: "bytes32",
+      },
+      {
+        internalType: "address",
+        name: "creator",
+        type: "address",
+      },
+      {
+        internalType: "bytes",
+        name: "topic",
+        type: "bytes",
+      },
+      {
+        internalType: "bytes",
+        name: "topicDescription",
+        type: "bytes",
       },
       {
         internalType: "bool",
