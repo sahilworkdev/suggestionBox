@@ -14,6 +14,7 @@ import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 import CryptoJS from "crypto-js";
 import { getCookie } from "cookies-next";
 import { encryptToBytes } from "@/lib/utils";
+import { baseUrl } from "@/constants/data";
 
 declare global {
   interface Window {
@@ -35,7 +36,7 @@ export default function CreateLinkForm() {
 
   const [copied, setCopied] = useState(false);
 
-  const baseUrl = "http://localhost:3000/receive";
+  // const baseUrl = "http://localhost:3000/receive";
 
   const handleCopyLink = async (text: string) => {
     await navigator.clipboard.writeText(text);
@@ -116,7 +117,7 @@ export default function CreateLinkForm() {
         topic: topic.trim(),
         description: desc.trim(),
         isPrivate,
-        link: `${baseUrl}/${linkIdBytes}`,
+        link: fullLink,
       });
 
       toast.success("Suggestion Link created successfully!");

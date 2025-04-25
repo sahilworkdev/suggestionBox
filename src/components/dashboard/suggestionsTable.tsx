@@ -10,21 +10,27 @@ import {
   TableRow,
 } from "../ui/table";
 import { Badge } from "../ui/badge";
-import { PlusCircle, Trash2 } from "lucide-react";
+import { InfoIcon, PlusCircle, Trash2 } from "lucide-react";
 import { Button } from "../ui/button";
 import { BrowserProvider, Contract } from "ethers";
 import { contractABI } from "@/abi";
 import { useEffect, useState } from "react";
+import { getCookie } from "cookies-next";
+import { cn, decryptFromBytes } from "@/lib/utils";
 
 type Suggestion = {
   id: string;
   createdAt: string;
   topic: string;
-  status: string;
+  desc: string;
+  isPrivate: boolean;
+  isActive: boolean;
 };
 export default function SuggestionsTable() {
-  const [links, setLinks] = useState<any[]>([]);
+  const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const contractAddress = String(process.env.NEXT_PUBLIC_CONTRACT_ADDRESS);
+  const secretKey = String(getCookie("userAccount"));
+
   const fetchUserLinks = async () => {
     try {
       if (!window.ethereum) return;
@@ -34,17 +40,24 @@ export default function SuggestionsTable() {
       const userAddress = await signer.getAddress();
       const contract = new Contract(contractAddress, contractABI, provider);
 
-      const linkIds: string[] = await contract.getLinksByCreator(userAddress);
-      const metadataMap = JSON.parse(
-        localStorage.getItem("linkMetadata") || "{}"
-      );
+      const info = await contract.getLinksByCreator(userAddress);
+      console.log("dashboard", info[0]);
+      const id = decryptFromBytes(secretKey, info[0][0]);
+      const topic = decryptFromBytes(secretKey, info[0][1]);
+      const desc = decryptFromBytes(secretKey, info[0][2]);
+      const isActive = decryptFromBytes(secretKey, info[0][3]);
+      const isPrivate = decryptFromBytes(secretKey, info[0][4]);
 
-      const linksWithDetails = linkIds.map((id) => ({
-        id,
-        ...metadataMap[id],
-      }));
-
-      return linksWithDetails || [];
+      setSuggestions([
+        {
+          id,
+          createdAt: new Date().toISOString(),
+          topic,
+          desc,
+          isPrivate: isPrivate === "true",
+          isActive: isActive === "true",
+        },
+      ]);
     } catch (err) {
       console.error("Error fetching links:", err);
       return [];
@@ -52,10 +65,10 @@ export default function SuggestionsTable() {
   };
 
   useEffect(() => {
-    fetchUserLinks().then((links) => setLinks(links || []));
+    fetchUserLinks();
   }, []);
 
-  console.log(">>>>>", links);
+  console.log(">>>>>", suggestions);
 
   return (
     <div className="w-full container mx-auto px-4">
@@ -72,7 +85,7 @@ export default function SuggestionsTable() {
         <Table>
           <TableHeader className="sticky top-0 bg-background z-10">
             <TableRow>
-              <TableHead className="p-2 md:p-4">Date</TableHead>
+              {/* <TableHead className="p-2 md:p-4">Date</TableHead> */}
               <TableHead className="p-2 md:p-4">Name</TableHead>
               <TableHead className="p-2 md:p-4 text-center">Received</TableHead>
               <TableHead className="p-2 md:p-4 text-center">Status</TableHead>
@@ -80,9 +93,9 @@ export default function SuggestionsTable() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {links?.map((suggestion: Suggestion) => (
+            {suggestions?.map((suggestion: Suggestion) => (
               <TableRow key={suggestion?.id}>
-                <TableCell className="font-medium text-left p-2 md:p-4">
+                {/* <TableCell className="font-medium text-left p-2 md:p-4">
                   <Link href={`/dashboard/${suggestion?.id}`} className="block">
                     <span className="sm:hidden">
                       {new Date(
@@ -98,7 +111,7 @@ export default function SuggestionsTable() {
                       ).toLocaleDateString()}
                     </span>
                   </Link>
-                </TableCell>
+                </TableCell> */}
                 <TableCell className="font-medium p-0">
                   <Link
                     href={`/dashboard/${suggestion?.id}`}
@@ -108,39 +121,40 @@ export default function SuggestionsTable() {
                   </Link>
                 </TableCell>
                 <TableCell className="p-0 text-center">
-                  {/* <Link
-            href={`/dashboard/chats/${feedback?.id}`}
-            className="block p-2 md:p-4"
-          >
-            {feedback?.messages?.length}
-          </Link> */}{" "}
-                  40
+                  <Link
+                    href={`/dashboard/${suggestion?.id}`}
+                    className="block p-2 md:p-4 capitalize"
+                  >
+                    40
+                  </Link>
                 </TableCell>
                 <TableCell className="text-center p-0">
-                  <Link href={`/dashboard/#`} className="block p-2 md:p-4">
+                  <Link
+                    href={`/dashboard/${suggestion?.id}`}
+                    className="block p-2 md:p-4"
+                  >
                     <Badge
-                    //   className={cn(
-                    //     "capitalize",
-                    //     feedback?.status === "active"
-                    //       ? "bg-yellow-500"
-                    //       : "bg-gray-500"
-                    //   )}
+                      className={cn(
+                        "capitalize",
+                        suggestion?.isActive ? "bg-yellow-500" : "bg-gray-500"
+                      )}
                     >
-                      {/* {feedback?.status} */} Active
+                      {suggestion?.isActive ? "Active" : "Inactive"}
                     </Badge>
                   </Link>
                 </TableCell>
                 <TableCell className="text-center p-0">
-                  <Link href={`/dashboard/#`} className="block p-2 md:p-4">
+                  <Link
+                    href={`/dashboard/${suggestion?.id}`}
+                    className="block p-2 md:p-4"
+                  >
                     <Badge
-                    //   className={cn(
-                    //     "capitalize",
-                    //     feedback?.status === "active"
-                    //       ? "bg-yellow-500"
-                    //       : "bg-gray-500"
-                    //   )}
+                      className={cn(
+                        "capitalize",
+                        suggestion?.isPrivate ? "bg-red-500" : "bg-green-500"
+                      )}
                     >
-                      {/* {feedback?.status} */} Public
+                      {suggestion?.isPrivate ? "Private" : "Public"}
                     </Badge>
                   </Link>
                 </TableCell>

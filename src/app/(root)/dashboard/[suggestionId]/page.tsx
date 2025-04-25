@@ -15,6 +15,9 @@ import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { getCookie } from "cookies-next";
+import Link from "next/link";
+import { baseUrl } from "@/constants/data";
+import { Button } from "@/components/ui/button";
 
 export default function SuggestionPage() {
   const { suggestionId } = useParams();
@@ -28,7 +31,6 @@ export default function SuggestionPage() {
   } | null>(null);
   const contractAddress = String(process.env.NEXT_PUBLIC_CONTRACT_ADDRESS);
   const secretKey = String(getCookie("userAccount"));
- 
 
   const fetchSuggestionById = async () => {
     try {
@@ -43,7 +45,7 @@ export default function SuggestionPage() {
       const encryptedTopicHex = info[1];
       const encryptedDescHex = info[2];
 
-      const decryptedTopic = decryptFromBytes(secretKey,encryptedTopicHex);
+      const decryptedTopic = decryptFromBytes(secretKey, encryptedTopicHex);
       const decryptedDesc = decryptFromBytes(secretKey, encryptedDescHex);
 
       console.log("Decrypted Topic:", decryptedTopic);
@@ -75,7 +77,9 @@ export default function SuggestionPage() {
               <BreadcrumbLink href="/">Home</BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
-            <BreadcrumbItem>Dashboard</BreadcrumbItem>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/dashboard"> Dashboard</BreadcrumbLink>
+            </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
               <BreadcrumbPage>{suggestion?.topic}</BreadcrumbPage>
@@ -115,16 +119,27 @@ export default function SuggestionPage() {
       </div>
 
       {/* Link Section */}
-      {/* <div className="flex justify-start items-center gap-2 mb-5">
+      <div className="flex justify-start items-center gap-2 mb-5 px-4">
         <Link
-          href={feedbacks[0]?.feedbackLink || "#"}
+          href={`${baseUrl}/${suggestionId}` || "#"}
           target="_blank"
           className="text-blue-500 text-sm truncate max-w-[30ch] md:max-w-[120ch]"
         >
-          {feedbacks[0]?.feedbackLink || "The link has been deactivated!"}
+          {suggestion?.isActive
+            ? `${baseUrl}/${suggestionId}`
+            : "The link has been deactivated!"}
         </Link>
-        <Button variant={"ghost"}>Copy</Button>
-      </div> */}
+        <Button
+          variant={"ghost"}
+          onClick={() => {
+            if (suggestion?.isActive) {
+              navigator.clipboard.writeText(`${baseUrl}/${suggestionId}`);
+            }
+          }}
+        >
+          Copy
+        </Button>
+      </div>
     </div>
   );
 }
