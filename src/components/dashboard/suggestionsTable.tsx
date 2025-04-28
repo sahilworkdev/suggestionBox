@@ -10,8 +10,9 @@ import {
   TableRow,
 } from "../ui/table";
 import { Badge } from "../ui/badge";
-import { InfoIcon, PlusCircle, Trash2 } from "lucide-react";
 import { Button } from "../ui/button";
+import { Skeleton } from "../ui/skeleton";
+import { PlusCircle } from "lucide-react";
 import { BrowserProvider, Contract } from "ethers";
 import { contractABI } from "@/abi";
 import { useEffect, useState } from "react";
@@ -28,6 +29,7 @@ type Suggestion = {
   isActive: boolean;
   feedbackCount: number;
 };
+
 export default function SuggestionsTable() {
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [loading, setLoading] = useState(true);
@@ -45,42 +47,34 @@ export default function SuggestionsTable() {
       const contract = new Contract(contractAddress, contractABI, provider);
 
       const info = await contract.getLinksByCreator(userAddress);
-      console.log("dashboard raw info", info);
 
       const ids = info[0];
       const encryptedTopics = info[1];
       const encryptedDescs = info[2];
       const activeStatuses = info[3];
-      // const deletedStatuses = info[4];
       const privacyLevels = info[4];
-      const feedbackCount = info[5];
+      const deletedStatuses = info[5];
+      const feedbackCount = info[6];
 
-      const suggestions: Suggestion[] = ids.map((id: string, index: number) => {
-        const topic = decryptFromBytes(secretKey, encryptedTopics[index]);
-        const desc = decryptFromBytes(secretKey, encryptedDescs[index]);
-        const isActive = activeStatuses[index] === true;
-        // const isDeleted = deletedStatuses[index] === true;
-        const isPrivate = privacyLevels[index] !== true;
-
-        const feedback = feedbackCount[index];
-       
-
-        return {
+      const suggestions: Suggestion[] = ids.map(
+        (id: string, index: number) => ({
           id,
           createdAt: new Date().toISOString(),
-          topic,
-          desc,
-          isActive,
-          // isDeleted,
-          isPrivate,
-          feedbackCount: feedback,
-        };
-      });
+          topic: decryptFromBytes(secretKey, encryptedTopics[index]),
+          desc: decryptFromBytes(secretKey, encryptedDescs[index]),
+          isActive: activeStatuses[index] === true,
+          isPrivate: privacyLevels[index] !== true,
+          feedbackCount: feedbackCount[index],
+          isDeleted: deletedStatuses[index] === true,
+        })
+      );
 
-      setSuggestions(suggestions);
+      // Filter out deleted suggestions
+      const activeSuggestions = suggestions.filter((s) => !s.isDeleted);
+
+      setSuggestions(activeSuggestions);
     } catch (err) {
       console.error("Error fetching links:", err);
-      return [];
     } finally {
       setLoading(false);
     }
@@ -90,114 +84,125 @@ export default function SuggestionsTable() {
     fetchUserLinks();
   }, []);
 
-  console.log(">>>>>", suggestions);
-
   return (
     <div className="w-full container mx-auto px-4">
-      <div className="w-full justify-between flex items-baseline">
-        <h2 className="text-2xl font-medium mb-4">Your Suggestions</h2>
-        <Button variant={"ghost"}>
-          <Link href={"/dashboard/create"} className="flex items-center gap-2">
+      <div className="w-full flex justify-between items-baseline mb-4">
+        <h2 className="text-2xl font-semibold">Your Suggestions</h2>
+        <Button variant="ghost">
+          <Link href="/dashboard/create" className="flex items-center gap-2">
             <PlusCircle className="w-4 h-auto" />
             Create
           </Link>
         </Button>
       </div>
-      <ScrollArea className="h-[600px] w-full">
+
+      <ScrollArea className="h-[600px] w-full border rounded-md">
         <Table>
           <TableHeader className="sticky top-0 bg-background z-10">
             <TableRow>
-              {/* <TableHead className="p-2 md:p-4">Date</TableHead> */}
+              <TableHead className="w-12 p-2 md:p-4 text-center">#</TableHead>
               <TableHead className="p-2 md:p-4">Name</TableHead>
               <TableHead className="p-2 md:p-4 text-center">Received</TableHead>
               <TableHead className="p-2 md:p-4 text-center">Status</TableHead>
               <TableHead className="p-2 md:p-4 text-center">Privacy</TableHead>
             </TableRow>
           </TableHeader>
+
           <TableBody>
-            {suggestions?.map((suggestion: Suggestion) => (
-              <TableRow key={suggestion?.id}>
-                {/* <TableCell className="font-medium text-left p-2 md:p-4">
-                  <Link href={`/dashboard/${suggestion?.id}`} className="block">
-                    <span className="sm:hidden">
-                      {new Date(
-                        String(suggestion?.createdAt)
-                      ).toLocaleDateString(undefined, {
-                        month: "short",
-                        day: "numeric",
-                      })}
-                    </span>
-                    <span className="hidden sm:inline">
-                      {new Date(
-                        String(suggestion?.createdAt)
-                      ).toLocaleDateString()}
-                    </span>
-                  </Link>
-                </TableCell> */}
-                <TableCell className="font-medium p-0">
-                  <Link
-                    href={`/dashboard/${suggestion?.id}`}
-                    className="block p-2 md:p-4 capitalize"
-                  >
-                    {suggestion?.topic}
-                  </Link>
-                </TableCell>
-                <TableCell className="p-0 text-center">
-                  <Link
-                    href={`/dashboard/${suggestion?.id}`}
-                    className="block p-2 md:p-4 capitalize"
-                  >
-                    {suggestion?.feedbackCount}
-                  </Link>
-                </TableCell>
-                <TableCell className="text-center p-0">
-                  <Link
-                    href={`/dashboard/${suggestion?.id}`}
-                    className="block p-2 md:p-4"
-                  >
-                    <Badge
-                      className={cn(
-                        "capitalize",
-                        suggestion?.isActive ? "bg-yellow-500" : "bg-gray-500"
-                      )}
+            {loading ? (
+              // Loading Skeleton
+              Array.from({ length: 5 }).map((_, idx) => (
+                <TableRow key={idx}>
+                  <TableCell className="text-center">
+                    <Skeleton className="h-4 w-4 mx-auto" />
+                  </TableCell>
+                  <TableCell className="p-4">
+                    <Skeleton className="h-4 w-3/4" />
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <Skeleton className="h-4 w-6 mx-auto" />
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <Skeleton className="h-6 w-16 mx-auto rounded-full" />
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <Skeleton className="h-6 w-16 mx-auto rounded-full" />
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : suggestions.length > 0 ? (
+              // Render Suggestions
+              suggestions.map((suggestion, index) => (
+                <TableRow key={suggestion.id}>
+                  <TableCell className="text-center font-semibold">
+                    {index + 1}
+                  </TableCell>
+                  <TableCell className="font-medium p-0">
+                    <Link
+                      href={`/dashboard/${suggestion.id}`}
+                      className="block p-2 md:p-4 capitalize"
                     >
-                      {suggestion?.isActive ? "Active" : "Inactive"}
-                    </Badge>
-                  </Link>
-                </TableCell>
-                <TableCell className="text-center p-0">
-                  <Link
-                    href={`/dashboard/${suggestion?.id}`}
-                    className="block p-2 md:p-4"
-                  >
-                    <Badge
-                      className={cn(
-                        "capitalize",
-                        !suggestion?.isPrivate ? "bg-red-500" : "bg-green-500"
-                      )}
+                      {suggestion.topic}
+                    </Link>
+                  </TableCell>
+                  <TableCell className="p-0 text-center">
+                    <Link
+                      href={`/dashboard/${suggestion.id}`}
+                      className="block p-2 md:p-4 capitalize"
                     >
-                      {!suggestion?.isPrivate ? "Private" : "Public"}
-                    </Badge>
-                  </Link>
+                      {suggestion.feedbackCount}
+                    </Link>
+                  </TableCell>
+                  <TableCell className="text-center p-0">
+                    <Link
+                      href={`/dashboard/${suggestion.id}`}
+                      className="block p-2 md:p-4"
+                    >
+                      <Badge
+                        className={cn(
+                          "capitalize",
+                          suggestion.isActive ? "bg-yellow-500" : "bg-gray-500"
+                        )}
+                      >
+                        {suggestion.isActive ? "Active" : "Inactive"}
+                      </Badge>
+                    </Link>
+                  </TableCell>
+                  <TableCell className="text-center p-0">
+                    <Link
+                      href={`/dashboard/${suggestion.id}`}
+                      className="block p-2 md:p-4"
+                    >
+                      <Badge
+                        className={cn(
+                          "capitalize",
+                          !suggestion.isPrivate ? "bg-red-500" : "bg-green-500"
+                        )}
+                      >
+                        {!suggestion.isPrivate ? "Private" : "Public"}
+                      </Badge>
+                    </Link>
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={5} className="text-center py-20">
+                  <div className="flex flex-col items-center justify-center gap-2 text-muted-foreground">
+                    <span className="text-lg font-medium">
+                      No suggestions found
+                    </span>
+                    <Link href="/dashboard/create">
+                      <Button variant="outline" className="mt-2">
+                        Create your first suggestion
+                      </Button>
+                    </Link>
+                  </div>
                 </TableCell>
-                {/* <TableCell className="text-center p-0">
-                  <Button
-                    size={"icon"}
-                    variant={"ghost"}
-                    className="cursor-pointer hover:text-red-500"
-                  >
-                    <Trash2 />
-                  </Button>
-                </TableCell> */}
               </TableRow>
-            ))}
+            )}
           </TableBody>
         </Table>
-        {suggestions.length === 0 && !loading && (
-          <span className="row-span-6 text-center py-10 bg-red-500">
-            No Data
-          </span>
-        )}
       </ScrollArea>
     </div>
   );
