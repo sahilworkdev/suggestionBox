@@ -4,23 +4,25 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { cn, decryptFromBytes } from "@/lib/utils";
+import { cn, decryptFromBytes, encryptToBytes } from "@/lib/utils";
 import { getCookie } from "cookies-next";
 import { BrowserProvider, Contract } from "ethers";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 export default function ReceiveSuggestionPage() {
   const { suggestionId } = useParams();
+  const [feedbackContent, setFeedbackContent] = useState<string>("");
   const [suggestion, setSuggestion] = useState<{
     topic: string;
     description: string;
     isActive: boolean;
     isDeleted: boolean;
     isPrivate: boolean;
-    feedbackCounts: number;
   } | null>(null);
+  const router = useRouter();
   const contractAddress = String(process.env.NEXT_PUBLIC_CONTRACT_ADDRESS);
   const secretKey = String(getCookie("userAccount"));
 
@@ -48,7 +50,6 @@ export default function ReceiveSuggestionPage() {
         isActive: info[3],
         isPrivate: info[4],
         isDeleted: info[5],
-        feedbackCounts: Number(info[6]),
       });
     } catch (err) {
       console.error("Error fetching link info:", err);
@@ -59,14 +60,58 @@ export default function ReceiveSuggestionPage() {
     fetchSuggestionById();
   }, []);
 
+  // console.log(">>>", suggestion);
+
+  const submitFeedback = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (!suggestionId) {
+      toast.info("Suggestion ID is missing.");
+      return;
+    }
+
+    if (!feedbackContent || feedbackContent.trim().length < 5) {
+      toast.info("Feedback must be at least 5 characters long.");
+      return;
+    }
+
+    try {
+      const provider = new BrowserProvider(window.ethereum);
+      const signer = await provider.getSigner();
+      const contract = new Contract(contractAddress, contractABI, signer);
+
+      const encryptedContent = encryptToBytes(
+        secretKey,
+        feedbackContent.trim()
+      );
+      const encryptedContentBytes = new TextEncoder().encode(encryptedContent);
+
+      const linkId = suggestionId;
+
+      const tx = await contract.submitFeedback(linkId, encryptedContentBytes);
+      await tx.wait();
+      toast.success("Feedback submitted successfully!");
+      router.push(`receive/${linkId}/sent`);
+      setFeedbackContent("");
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to submit feedback!");
+    }
+  };
+
   console.log(suggestion);
   return (
     <div className="container mx-auto py-10">
-      <form className="max-w-2xl mx-auto flex w-full flex-col gap-4">
+      <form
+        className="max-w-2xl mx-auto flex w-full flex-col gap-4"
+        onSubmit={submitFeedback}
+      >
         <div className="text-xl font-semibold mt-6 sm:mt-8">
-          Send your feedback for :{" "}
-          <p className="text-brand font-bold italic">
-            {suggestion?.topic}
+          <p>
+            Send your feedback for :
+            <span className="text-brand font-bold italic">
+              {suggestion?.topic}
+            </span>
           </p>
           <p className="text-sm">{suggestion?.description}</p>
         </div>
@@ -82,11 +127,7 @@ export default function ReceiveSuggestionPage() {
           <div>
             {!suggestion?.isPrivate && (
               <p>
-                <Link
-                  //   href={`/receive/${suggestionId}/all-feedbacks`}
-                  href={`/receive/#`}
-                  className="underline"
-                >
+                <Link href={`/receive/#`} className="underline">
                   Click here
                 </Link>{" "}
                 to see others&apos; suggestions
@@ -109,8 +150,12 @@ export default function ReceiveSuggestionPage() {
           id="feedback"
           required
           rows={5}
+          value={feedbackContent}
+          onChange={(e) => setFeedbackContent(e.target.value)}
         />
-        <Button className="w-full px-4 py-2">Submit Suggestion</Button>
+        <Button className="w-full px-4 py-2" type="submit">
+          Submit Suggestion
+        </Button>
       </form>
 
       <div className="max-w-2xl mx-auto  text-sm md:text-xl font-semibold mt-8">

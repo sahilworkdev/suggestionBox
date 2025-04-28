@@ -7,18 +7,22 @@ import {
 import { Button } from "../ui/button";
 import { ChevronDown } from "lucide-react";
 
-const PRIVACY_OPTIONS = [
+const STATUS_OPTIONS = [
   {
-    id: "public",
-    name: "Public",
+    id: "Active",
+    name: "active",
   },
   {
-    id: "private",
-    name: "Private",
+    id: "inactive",
+    name: "inactive",
   },
 ];
 
-export default function ChangePrivacy({ suggestion }: { suggestion: string }) {
+interface ChangeStatusProps {
+  suggestion: string;
+}
+
+export default function ChangeStatus({ suggestion }: ChangeStatusProps) {
   return (
     <div>
       <DropdownMenu>
@@ -27,15 +31,15 @@ export default function ChangePrivacy({ suggestion }: { suggestion: string }) {
             variant={"outline"}
             className="flex items-center gap-2 justify-center"
           >
-            Change Privacy
+            Change Status
             <ChevronDown className="w-4 h-auto" />
           </Button>
         </DropdownMenuTrigger>
 
         <DropdownMenuContent>
-          {PRIVACY_OPTIONS.map((privacy) => (
-            <DropdownMenuItem key={privacy.id}>
-              <button className="capitalize">{privacy.name}</button>
+          {STATUS_OPTIONS.map((status) => (
+            <DropdownMenuItem key={status.id}>
+              <button className="capitalize">{status.name}</button>
             </DropdownMenuItem>
           ))}
         </DropdownMenuContent>

@@ -58,6 +58,78 @@ export default function CreateLinkForm() {
   // const namee = "sahil";
   // console.log(encryptToBytes(namee));
 
+  // const generateLink = async () => {
+  //   if (!window.ethereum) {
+  //     toast.error("MetaMask not detected!");
+  //     return;
+  //   }
+
+  //   if (!topic || topic.trim().length < 4) {
+  //     toast.info("Topic must be at least 4 characters long.");
+  //     return;
+  //   }
+
+  //   if (!desc || desc.trim().length < 12) {
+  //     toast.info("Description must be at least 12 characters long.");
+  //     return;
+  //   }
+
+  //   try {
+  //     setPending(true);
+  //     await window.ethereum.request({ method: "eth_requestAccounts" });
+
+  //     const provider = new BrowserProvider(window.ethereum);
+  //     const signer = await provider.getSigner();
+  //     const contract = new Contract(contractAddress, contractABI, signer);
+
+  //     const rawId = `${Date.now()}-${Math.random()
+  //       .toString(36)
+  //       .substring(2, 10)}`;
+  //     const fullLink = `${baseUrl}/${rawId}`;
+  //     console.log(">>>", fullLink);
+  //     const linkIdBytes = new TextEncoder().encode(
+  //       encryptToBytes(secretKey, fullLink)
+  //     );
+  //     const encryptedTopicBytes = new TextEncoder().encode(
+  //       encryptToBytes(secretKey, topic.trim())
+  //     );
+  //     const encryptedDescBytes = new TextEncoder().encode(
+  //       encryptToBytes(secretKey, desc.trim())
+  //     );
+  //     const isPrivate = privacy === "private";
+
+  //     console.log(
+  //       linkIdBytes,
+  //       encryptedTopicBytes,
+  //       encryptedDescBytes,
+  //       isPrivate
+  //     );
+  //     const tx = await contract.createLink(
+  //       linkIdBytes,
+  //       encryptedTopicBytes,
+  //       encryptedDescBytes,
+  //       isPrivate
+  //     );
+  //     await tx.wait();
+
+  //     setLatestSuggestion({
+  //       topic: topic.trim(),
+  //       description: desc.trim(),
+  //       isPrivate,
+  //       link: fullLink,
+  //     });
+
+  //     toast.success("Suggestion Link created successfully!");
+  //     setTopic("");
+  //     setDesc("");
+  //   } catch (err) {
+  //     console.error(err);
+  //     toast.error("Something went wrong!");
+  //   } finally {
+  //     setPending(false);
+  //   }
+  // };
+
   const generateLink = async () => {
     if (!window.ethereum) {
       toast.error("MetaMask not detected!");
@@ -85,10 +157,9 @@ export default function CreateLinkForm() {
       const rawId = `${Date.now()}-${Math.random()
         .toString(36)
         .substring(2, 10)}`;
-      const fullLink = `${baseUrl}/${rawId}`;
-      console.log(">>>", fullLink);
+
       const linkIdBytes = new TextEncoder().encode(
-        encryptToBytes(secretKey, fullLink)
+        encryptToBytes(secretKey, rawId)
       );
       const encryptedTopicBytes = new TextEncoder().encode(
         encryptToBytes(secretKey, topic.trim())
@@ -98,20 +169,36 @@ export default function CreateLinkForm() {
       );
       const isPrivate = privacy === "private";
 
-      console.log(
-        linkIdBytes,
-        encryptedTopicBytes,
-        encryptedDescBytes,
-        isPrivate
-      );
       const tx = await contract.createLink(
         linkIdBytes,
         encryptedTopicBytes,
         encryptedDescBytes,
         isPrivate
       );
-      await tx.wait();
-      
+
+      const receipt = await tx.wait();
+
+      // Get the linkId from emitted event
+      let actualLinkId = null;
+      for (const log of receipt.logs) {
+        try {
+          const parsedLog = contract.interface.parseLog(log);
+          if (parsedLog?.name === "LinkCreated") {
+            // assuming your contract emits a "LinkCreated" event
+            actualLinkId = parsedLog?.args.linkId; // or whatever the event parameter is called
+            break;
+          }
+        } catch (e) {
+          // not this contract's event, skip
+        }
+      }
+
+      if (!actualLinkId) {
+        throw new Error("Link ID not found in transaction logs.");
+      }
+
+      const fullLink = `${baseUrl}/${actualLinkId}`;
+      console.log(">>> Full link:", fullLink);
 
       setLatestSuggestion({
         topic: topic.trim(),
@@ -216,7 +303,7 @@ export default function CreateLinkForm() {
           </div>
 
           <div className="w-full flex justify-center items-center gap-1">
-            <div className="p-[9px] bg-zinc-800 rounded">
+            <div className="p-[9px] bg-zinc-800 rounded text-ellipsis max-w-[150ch]">
               {latestSuggestion.link}
             </div>
             <div

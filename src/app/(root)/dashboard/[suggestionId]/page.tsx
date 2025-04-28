@@ -18,6 +18,9 @@ import { getCookie } from "cookies-next";
 import Link from "next/link";
 import { baseUrl } from "@/constants/data";
 import { Button } from "@/components/ui/button";
+import ChangePrivacy from "@/components/dashboard/changePrivacy";
+import ChangeStatus from "@/components/dashboard/changeStatus";
+import { Check, Copy } from "lucide-react";
 
 export default function SuggestionPage() {
   const { suggestionId } = useParams();
@@ -29,8 +32,17 @@ export default function SuggestionPage() {
     isPrivate: boolean;
     feedbackCount: number;
   } | null>(null);
+  const [copied, setCopied] = useState(false);
   const contractAddress = String(process.env.NEXT_PUBLIC_CONTRACT_ADDRESS);
   const secretKey = String(getCookie("userAccount"));
+
+  const handleCopyLink = async (text: string) => {
+    await navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => {
+      setCopied(false);
+    }, 2000);
+  };
 
   const fetchSuggestionById = async () => {
     try {
@@ -107,12 +119,12 @@ export default function SuggestionPage() {
             {suggestion?.isPrivate ? "Private" : "Public"}
           </Badge>
         </div>
-        {/* <div className="text-sm text-wrap w-full">{suggestion?.description}</div> */}
-        {/* <div className="flex items-center gap-2">
-          <ChangePrivacy feedback={feedbacks[0]} />
-          <ChangeStatus feedback={feedbacks[0]} />
-          <MoreOptions feedbackId={feedbackId} />
-        </div> */}
+
+        <div className="flex items-center gap-2">
+          <ChangePrivacy suggestion={String(suggestionId)} />
+          <ChangeStatus suggestion={String(suggestionId)} />
+          {/* <MoreOptions feedbackId={feedbackId} /> */}
+        </div>
       </div>
       <div className="text-sm text-wrap w-full px-4">
         {suggestion?.description}
@@ -131,13 +143,9 @@ export default function SuggestionPage() {
         </Link>
         <Button
           variant={"ghost"}
-          onClick={() => {
-            if (suggestion?.isActive) {
-              navigator.clipboard.writeText(`${baseUrl}/${suggestionId}`);
-            }
-          }}
+          onClick={() => handleCopyLink(`${baseUrl}/${suggestionId}`)}
         >
-          Copy
+          {copied ? <Check /> : <Copy />}
         </Button>
       </div>
     </div>
