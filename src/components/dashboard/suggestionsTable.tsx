@@ -26,6 +26,7 @@ type Suggestion = {
   isPrivate: boolean;
   isDeleted: boolean;
   isActive: boolean;
+  feedbackCount: number;
 };
 export default function SuggestionsTable() {
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
@@ -44,25 +45,39 @@ export default function SuggestionsTable() {
       const contract = new Contract(contractAddress, contractABI, provider);
 
       const info = await contract.getLinksByCreator(userAddress);
-      console.log("dashboard", info[0]);
-      const id = decryptFromBytes(secretKey, info[0][0]);
-      const topic = decryptFromBytes(secretKey, info[0][1]);
-      const desc = decryptFromBytes(secretKey, info[0][2]);
-      const isActive = decryptFromBytes(secretKey, info[0][3]);
-      const isDeleted = decryptFromBytes(secretKey, info[0][4]);
-      const isPrivate = decryptFromBytes(secretKey, info[0][5]);
+      console.log("dashboard raw info", info);
 
-      setSuggestions([
-        {
+      const ids = info[0];
+      const encryptedTopics = info[1];
+      const encryptedDescs = info[2];
+      const activeStatuses = info[3];
+      // const deletedStatuses = info[4];
+      const privacyLevels = info[4];
+      const feedbackCount = info[5];
+
+      const suggestions: Suggestion[] = ids.map((id: string, index: number) => {
+        const topic = decryptFromBytes(secretKey, encryptedTopics[index]);
+        const desc = decryptFromBytes(secretKey, encryptedDescs[index]);
+        const isActive = activeStatuses[index] === true;
+        // const isDeleted = deletedStatuses[index] === true;
+        const isPrivate = privacyLevels[index] !== true;
+
+        const feedback = feedbackCount[index];
+       
+
+        return {
           id,
           createdAt: new Date().toISOString(),
           topic,
           desc,
-          isActive: isActive === "true",
-          isDeleted: isDeleted === "true",
-          isPrivate: isPrivate === "true",
-        },
-      ]);
+          isActive,
+          // isDeleted,
+          isPrivate,
+          feedbackCount: feedback,
+        };
+      });
+
+      setSuggestions(suggestions);
     } catch (err) {
       console.error("Error fetching links:", err);
       return [];
@@ -92,7 +107,7 @@ export default function SuggestionsTable() {
         <Table>
           <TableHeader className="sticky top-0 bg-background z-10">
             <TableRow>
-              <TableHead className="p-2 md:p-4">Date</TableHead>
+              {/* <TableHead className="p-2 md:p-4">Date</TableHead> */}
               <TableHead className="p-2 md:p-4">Name</TableHead>
               <TableHead className="p-2 md:p-4 text-center">Received</TableHead>
               <TableHead className="p-2 md:p-4 text-center">Status</TableHead>
@@ -102,7 +117,7 @@ export default function SuggestionsTable() {
           <TableBody>
             {suggestions?.map((suggestion: Suggestion) => (
               <TableRow key={suggestion?.id}>
-                <TableCell className="font-medium text-left p-2 md:p-4">
+                {/* <TableCell className="font-medium text-left p-2 md:p-4">
                   <Link href={`/dashboard/${suggestion?.id}`} className="block">
                     <span className="sm:hidden">
                       {new Date(
@@ -118,7 +133,7 @@ export default function SuggestionsTable() {
                       ).toLocaleDateString()}
                     </span>
                   </Link>
-                </TableCell>
+                </TableCell> */}
                 <TableCell className="font-medium p-0">
                   <Link
                     href={`/dashboard/${suggestion?.id}`}
@@ -132,7 +147,7 @@ export default function SuggestionsTable() {
                     href={`/dashboard/${suggestion?.id}`}
                     className="block p-2 md:p-4 capitalize"
                   >
-                    40
+                    {suggestion?.feedbackCount}
                   </Link>
                 </TableCell>
                 <TableCell className="text-center p-0">
@@ -158,14 +173,14 @@ export default function SuggestionsTable() {
                     <Badge
                       className={cn(
                         "capitalize",
-                        suggestion?.isPrivate ? "bg-red-500" : "bg-green-500"
+                        !suggestion?.isPrivate ? "bg-red-500" : "bg-green-500"
                       )}
                     >
-                      {suggestion?.isPrivate ? "Private" : "Public"}
+                      {!suggestion?.isPrivate ? "Private" : "Public"}
                     </Badge>
                   </Link>
                 </TableCell>
-                <TableCell className="text-center p-0">
+                {/* <TableCell className="text-center p-0">
                   <Button
                     size={"icon"}
                     variant={"ghost"}
@@ -173,12 +188,16 @@ export default function SuggestionsTable() {
                   >
                     <Trash2 />
                   </Button>
-                </TableCell>
+                </TableCell> */}
               </TableRow>
             ))}
-            {suggestions.length === 0 && !loading && <TableRow className="row-span-6 text-center py-10">No Data</TableRow>}
           </TableBody>
         </Table>
+        {suggestions.length === 0 && !loading && (
+          <span className="row-span-6 text-center py-10 bg-red-500">
+            No Data
+          </span>
+        )}
       </ScrollArea>
     </div>
   );
