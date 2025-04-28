@@ -1,3 +1,5 @@
+"use client";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -6,19 +8,53 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "../ui/button";
 import { ChevronDown } from "lucide-react";
+import { useState } from "react";
+import { BrowserProvider, Contract } from "ethers";
+import { contractABI } from "@/abi";
+import { toast } from "sonner";
 
 const PRIVACY_OPTIONS = [
   {
     id: "public",
     name: "Public",
+    value: false,
   },
   {
     id: "private",
     name: "Private",
+    value: true,
   },
 ];
 
+const contractAddress = String(process.env.NEXT_PUBLIC_CONTRACT_ADDRESS);
+
 export default function ChangePrivacy({ suggestion }: { suggestion: string }) {
+  const [loading, setLoading] = useState(false);
+
+  const changePrivacy = async (isPrivate: boolean) => {
+    try {
+      if (!window.ethereum) {
+        console.error("No wallet found");
+        return;
+      }
+
+      setLoading(true);
+
+      const provider = new BrowserProvider(window.ethereum);
+      const signer = await provider.getSigner();
+      const contract = new Contract(contractAddress, contractABI, signer);
+
+      const tx = await contract.setLinkPrivacy(suggestion, isPrivate);
+      await tx.wait();
+
+      toast.success("Privacy changed successfully!");
+    } catch (err) {
+      toast.error("Error changing privacy");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div>
       <DropdownMenu>
@@ -26,16 +62,20 @@ export default function ChangePrivacy({ suggestion }: { suggestion: string }) {
           <Button
             variant={"outline"}
             className="flex items-center gap-2 justify-center"
+            disabled={loading}
           >
-            Change Privacy
+            {loading ? "Updating..." : "Change Privacy"}
             <ChevronDown className="w-4 h-auto" />
           </Button>
         </DropdownMenuTrigger>
 
         <DropdownMenuContent>
           {PRIVACY_OPTIONS.map((privacy) => (
-            <DropdownMenuItem key={privacy.id}>
-              <button className="capitalize">{privacy.name}</button>
+            <DropdownMenuItem
+              key={privacy.id}
+              onClick={() => changePrivacy(privacy.value)}
+            >
+              <span className="capitalize">{privacy.name}</span>
             </DropdownMenuItem>
           ))}
         </DropdownMenuContent>

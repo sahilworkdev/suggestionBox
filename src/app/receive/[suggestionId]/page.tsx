@@ -91,7 +91,7 @@ export default function ReceiveSuggestionPage() {
       const tx = await contract.submitFeedback(linkId, encryptedContentBytes);
       await tx.wait();
       toast.success("Feedback submitted successfully!");
-      router.push(`receive/${linkId}/sent`);
+      router.push(`${linkId}/sent`);
       setFeedbackContent("");
     } catch (err) {
       console.error(err);

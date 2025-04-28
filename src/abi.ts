@@ -1,4 +1,4 @@
-export const contractABI = [
+export const contractABI =[
 	{
 		"inputs": [
 			{
@@ -677,6 +677,40 @@ export const contractABI = [
 			{
 				"internalType": "uint256[]",
 				"name": "",
+				"type": "uint256[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "bytes32",
+				"name": "_linkId",
+				"type": "bytes32"
+			}
+		],
+		"name": "getLinkFeedbacks",
+		"outputs": [
+			{
+				"internalType": "bytes[]",
+				"name": "contents",
+				"type": "bytes[]"
+			},
+			{
+				"internalType": "address[]",
+				"name": "authors",
+				"type": "address[]"
+			},
+			{
+				"internalType": "uint256[]",
+				"name": "timestamps",
+				"type": "uint256[]"
+			},
+			{
+				"internalType": "uint256[]",
+				"name": "feedbackIds",
 				"type": "uint256[]"
 			}
 		],
