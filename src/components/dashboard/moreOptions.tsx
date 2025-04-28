@@ -22,6 +22,7 @@ import { useState } from "react";
 import { BrowserProvider, Contract } from "ethers";
 import { contractABI } from "@/abi";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 interface MoreOptionsProps {
   suggestion: string;
@@ -31,6 +32,7 @@ const contractAddress = String(process.env.NEXT_PUBLIC_CONTRACT_ADDRESS);
 
 export default function MoreOptions({ suggestion }: MoreOptionsProps) {
   const [loading, setLoading] = useState(false);
+  const router = useRouter()
 
   const deleteLink = async () => {
     try {
@@ -49,6 +51,7 @@ export default function MoreOptions({ suggestion }: MoreOptionsProps) {
       await tx.wait();
 
       toast.success("Link deleted successfully!");
+      router.push('/dashboard')
     } catch (err) {
       toast.error("Error deleting link:");
     } finally {

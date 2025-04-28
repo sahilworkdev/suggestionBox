@@ -24,14 +24,17 @@ type Suggestion = {
   topic: string;
   desc: string;
   isPrivate: boolean;
+  isDeleted: boolean;
   isActive: boolean;
 };
 export default function SuggestionsTable() {
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
+  const [loading, setLoading] = useState(true);
   const contractAddress = String(process.env.NEXT_PUBLIC_CONTRACT_ADDRESS);
   const secretKey = String(getCookie("userAccount"));
 
   const fetchUserLinks = async () => {
+    setLoading(true);
     try {
       if (!window.ethereum) return;
 
@@ -46,7 +49,8 @@ export default function SuggestionsTable() {
       const topic = decryptFromBytes(secretKey, info[0][1]);
       const desc = decryptFromBytes(secretKey, info[0][2]);
       const isActive = decryptFromBytes(secretKey, info[0][3]);
-      const isPrivate = decryptFromBytes(secretKey, info[0][4]);
+      const isDeleted = decryptFromBytes(secretKey, info[0][4]);
+      const isPrivate = decryptFromBytes(secretKey, info[0][5]);
 
       setSuggestions([
         {
@@ -54,13 +58,16 @@ export default function SuggestionsTable() {
           createdAt: new Date().toISOString(),
           topic,
           desc,
-          isPrivate: isPrivate === "true",
           isActive: isActive === "true",
+          isDeleted: isDeleted === "true",
+          isPrivate: isPrivate === "true",
         },
       ]);
     } catch (err) {
       console.error("Error fetching links:", err);
       return [];
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -85,7 +92,7 @@ export default function SuggestionsTable() {
         <Table>
           <TableHeader className="sticky top-0 bg-background z-10">
             <TableRow>
-              {/* <TableHead className="p-2 md:p-4">Date</TableHead> */}
+              <TableHead className="p-2 md:p-4">Date</TableHead>
               <TableHead className="p-2 md:p-4">Name</TableHead>
               <TableHead className="p-2 md:p-4 text-center">Received</TableHead>
               <TableHead className="p-2 md:p-4 text-center">Status</TableHead>
@@ -95,7 +102,7 @@ export default function SuggestionsTable() {
           <TableBody>
             {suggestions?.map((suggestion: Suggestion) => (
               <TableRow key={suggestion?.id}>
-                {/* <TableCell className="font-medium text-left p-2 md:p-4">
+                <TableCell className="font-medium text-left p-2 md:p-4">
                   <Link href={`/dashboard/${suggestion?.id}`} className="block">
                     <span className="sm:hidden">
                       {new Date(
@@ -111,7 +118,7 @@ export default function SuggestionsTable() {
                       ).toLocaleDateString()}
                     </span>
                   </Link>
-                </TableCell> */}
+                </TableCell>
                 <TableCell className="font-medium p-0">
                   <Link
                     href={`/dashboard/${suggestion?.id}`}
@@ -169,6 +176,7 @@ export default function SuggestionsTable() {
                 </TableCell>
               </TableRow>
             ))}
+            {suggestions.length === 0 && !loading && <TableRow className="row-span-6 text-center py-10">No Data</TableRow>}
           </TableBody>
         </Table>
       </ScrollArea>
