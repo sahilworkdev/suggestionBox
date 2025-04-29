@@ -85,7 +85,7 @@ export default function Header() {
                       // onClick={disconnectWallet}
                       onClick={() => {
                         setShowProfile(false);
-                        () => disconnectWallet();
+                        disconnectWallet();
                       }}
                     >
                       <LogOut className="text-red-500" />
