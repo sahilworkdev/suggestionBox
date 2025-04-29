@@ -24,6 +24,7 @@ import ChangeStatus from "@/components/dashboard/changeStatus";
 import { Check, Copy } from "lucide-react";
 import MoreOptions from "@/components/dashboard/moreOptions";
 import { Skeleton } from "@/components/ui/skeleton";
+import FeedbackList from "@/components/dashboard/feedbackList";
 
 export default function SuggestionPage() {
   const { suggestionId } = useParams();
@@ -42,7 +43,7 @@ export default function SuggestionPage() {
   >([]);
   const [loadingFeedbacks, setLoadingFeedbacks] = useState(true);
 
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
   const handleCopyLink = async (text: string) => {
     await navigator.clipboard.writeText(text);
@@ -204,7 +205,7 @@ export default function SuggestionPage() {
       )}
 
       {/* Feedbacks Section */}
-      <div className="px-4 mt-8">
+      {/* <div className="px-4 mt-8">
         <h2 className="text-xl font-bold mb-4">
           Feedbacks ({loadingFeedbacks ? "..." : feedbacks.length})
         </h2>
@@ -235,7 +236,8 @@ export default function SuggestionPage() {
             ))}
           </div>
         )}
-      </div>
+      </div> */}
+      <FeedbackList feedbacks={feedbacks} loading={loadingFeedbacks} />
     </div>
   );
 }
