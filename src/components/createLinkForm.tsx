@@ -14,7 +14,6 @@ import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 
 import { getCookie } from "cookies-next";
 import { encryptToBytes } from "@/lib/utils";
-import { baseUrl } from "@/constants/data";
 
 declare global {
   interface Window {
@@ -36,7 +35,7 @@ export default function CreateLinkForm() {
 
   const [copied, setCopied] = useState(false);
 
-  // const baseUrl = "http://localhost:3000/receive";
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
   const handleCopyLink = async (text: string) => {
     await navigator.clipboard.writeText(text);
@@ -107,9 +106,9 @@ export default function CreateLinkForm() {
             break;
           }
         } catch (e) {
-         if(e instanceof Error){
-          toast.error(e.message ||"Error Creating Link.")
-         }
+          if (e instanceof Error) {
+            toast.error(e.message || "Error Creating Link.");
+          }
         }
       }
 
@@ -238,6 +237,5 @@ export default function CreateLinkForm() {
     </>
   );
 }
-
 
 // deploy commit

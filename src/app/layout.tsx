@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Suggestion Box",
-  description: "A simple suggestion box app",
+  title: "Suggestion Box - Speak Freely. Suggest Anonymously.",
+  description: "Empower your team with a platform to share ideas and feedback anonymously.",
 };
 
 export default function RootLayout({
