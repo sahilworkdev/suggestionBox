@@ -17,7 +17,7 @@ import { useEffect, useState } from "react";
 
 import { getCookie } from "cookies-next";
 import Link from "next/link";
-import { baseUrl } from "@/constants/data";
+
 import { Button } from "@/components/ui/button";
 import ChangePrivacy from "@/components/dashboard/changePrivacy";
 import ChangeStatus from "@/components/dashboard/changeStatus";
@@ -41,6 +41,8 @@ export default function SuggestionPage() {
     { content: string; author: string; timestamp: string }[]
   >([]);
   const [loadingFeedbacks, setLoadingFeedbacks] = useState(true);
+
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL
 
   const handleCopyLink = async (text: string) => {
     await navigator.clipboard.writeText(text);
