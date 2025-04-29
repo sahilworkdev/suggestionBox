@@ -9,6 +9,7 @@ import { deleteCookie, getCookie, setCookie } from "cookies-next";
 import { Button } from "../ui/button";
 import { toast } from "sonner";
 import Image from "next/image";
+import CopyButton from "../buttons/copyButton";
 
 export default function Header() {
   const [user, setUser] = useState<string | null>(null);
@@ -64,31 +65,38 @@ export default function Header() {
                 <p onClick={() => setShowProfile(!showProfile)}>
                   <Image width={20} height={20} src="/prof.svg" alt="prof" />
                 </p>
-                {/* {showProfile && (
-                  <p className="absolute top-6 right-0">
-                    erjkgnejirgnerognerogjneorng
-                  </p>
-                )} */}
+
                 {showProfile && (
                   <div
-                    className={` absolute top-10 right-0 flex flex-col gap-2 border border-gray-800 rounded-md p-2 justify-start items-start bg-gray-800`}
+                    className={` absolute max-w-sm top-8 shadow-md right-0 flex flex-col gap-2 border rounded p-2 justify-start items-start bg-background`}
                   >
-                    <Button asChild variant={"ghost"}>
+                    <Button
+                      asChild
+                      variant={"ghost"}
+                      onClick={() => setShowProfile(false)}
+                    >
                       <Link href={"/dashboard"}>Dashboard</Link>
                     </Button>
-                    <span className="rounded-full px-4 py-2 bg-blue-600">
-                      {user}
-                    </span>
 
                     <Button
-                      size={"icon"}
                       variant={"ghost"}
                       className="cursor-pointer"
                       type="button"
-                      onClick={disconnectWallet}
+                      // onClick={disconnectWallet}
+                      onClick={() => {
+                        setShowProfile(false);
+                        () => disconnectWallet();
+                      }}
                     >
                       <LogOut className="text-red-500" />
+                      <span>Logout</span>
                     </Button>
+                    <div
+                      className="rounded-full px-4 py-2 bg-blue-800/40 flex justify-center items-center gap-2"
+                      onClick={() => setShowProfile(false)}
+                    >
+                     <span className="truncate max-w-[24ch] text-ellipsis"> {user}</span> <CopyButton textToCopy={user} />
+                    </div>
                   </div>
                 )}
               </div>

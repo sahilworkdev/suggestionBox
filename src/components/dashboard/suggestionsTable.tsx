@@ -193,7 +193,7 @@ export default function SuggestionsTable() {
                       No suggestions found
                     </span>
                     <Link href="/dashboard/create">
-                      <Button variant="outline" className="mt-2">
+                      <Button variant="outline" className="mt-2 cursor-pointer">
                         Create your first suggestion
                       </Button>
                     </Link>

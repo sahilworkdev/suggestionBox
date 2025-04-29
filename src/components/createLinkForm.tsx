@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Check, Copy, LoaderCircle } from "lucide-react";
+import {  LoaderCircle } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { ShineBorder } from "./magicui/shine-border";
@@ -14,6 +14,7 @@ import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 
 import { getCookie } from "cookies-next";
 import { encryptToBytes } from "@/lib/utils";
+import CopyButton from "./buttons/copyButton";
 
 declare global {
   interface Window {
@@ -33,17 +34,17 @@ export default function CreateLinkForm() {
     link: string;
   } | null>(null);
 
-  const [copied, setCopied] = useState(false);
+  // const [copied, setCopied] = useState(false);
 
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
-  const handleCopyLink = async (text: string) => {
-    await navigator.clipboard.writeText(text);
-    setCopied(true);
-    setTimeout(() => {
-      setCopied(false);
-    }, 2000);
-  };
+  // const handleCopyLink = async (text: string) => {
+  //   await navigator.clipboard.writeText(text);
+  //   setCopied(true);
+  //   setTimeout(() => {
+  //     setCopied(false);
+  //   }, 2000);
+  // };
   const contractAddress = String(process.env.NEXT_PUBLIC_CONTRACT_ADDRESS);
 
   const secretKey = String(getCookie("userAccount"));
@@ -124,7 +125,7 @@ export default function CreateLinkForm() {
         throw new Error("Link ID not found in transaction logs.");
       }
 
-      const fullLink = `${baseUrl}/receive/${actualLinkId}`;
+      const fullLink = `${baseUrl}receive/${actualLinkId}`;
       // console.log(">>> Full link:", fullLink);
 
       setLatestSuggestion({
@@ -138,8 +139,8 @@ export default function CreateLinkForm() {
       setTopic("");
       setDesc("");
     } catch (err) {
-      console.error(err);
-      toast.error("Something went wrong!");
+      // console.error(err);
+      toast.error("Error generating unique link.");
     } finally {
       setPending(false);
     }
@@ -234,12 +235,13 @@ export default function CreateLinkForm() {
             <div className="p-[9px] bg-zinc-800 rounded text-ellipsis max-w-[150ch] truncate">
               {latestSuggestion.link}
             </div>
-            <div
+            {/* <div
               className="border border-zinc-800 text-zinc-600 p-2 rounded cursor-pointer"
               onClick={() => handleCopyLink(latestSuggestion.link)}
             >
               {copied ? <Check /> : <Copy />}
-            </div>
+            </div> */}
+            <CopyButton textToCopy={latestSuggestion.link}/>
           </div>
         </div>
       )}

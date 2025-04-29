@@ -38,7 +38,7 @@ export default function ChangeStatus({ suggestion }: ChangeStatusProps) {
   const changeStatus = async (isActive: boolean) => {
     try {
       if (!window.ethereum) {
-        console.error("No wallet found");
+        toast.error("No wallet found");
         return;
       }
 

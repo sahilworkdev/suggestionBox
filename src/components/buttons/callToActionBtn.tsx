@@ -1,6 +1,6 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { InteractiveHoverButton } from "../magicui/interactive-hover-button";
+import { InteractiveHoverButton } from "./interactive-hover-button";
 
 import { toast } from "sonner";
 import { useEffect, useState } from "react";

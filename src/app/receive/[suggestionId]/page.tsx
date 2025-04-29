@@ -44,7 +44,7 @@ export default function ReceiveSuggestionPage() {
       const decryptedTopic = decryptFromBytes(secretKey, encryptedTopicHex);
       const decryptedDesc = decryptFromBytes(secretKey, encryptedDescHex);
 
-      console.log("Decrypted Topic:", decryptedTopic);
+      // console.log("Decrypted Topic:", decryptedTopic);
 
       setSuggestion({
         topic: decryptedTopic,
@@ -54,7 +54,8 @@ export default function ReceiveSuggestionPage() {
         isDeleted: info[5],
       });
     } catch (err) {
-      console.error("Error fetching link info:", err);
+      if(err instanceof Error)
+      toast.error("Error fetching suuggestion info.");
     }
   };
 
@@ -103,8 +104,10 @@ export default function ReceiveSuggestionPage() {
       router.push(`${linkId}/sent`);
       setFeedbackContent("");
     } catch (err) {
-      console.error(err);
+  
+    if(err instanceof Error){
       toast.error("Failed to submit suggestion!");
+    }
     } finally {
       setPending(false);
     }

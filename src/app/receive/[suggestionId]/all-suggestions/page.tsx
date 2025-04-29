@@ -7,6 +7,7 @@ import { getCookie } from "cookies-next";
 import { BrowserProvider, Contract } from "ethers";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 export default function PublicSuggestionPage() {
   const { suggestionId } = useParams();
@@ -34,7 +35,7 @@ export default function PublicSuggestionPage() {
       const contract = new Contract(contractAddress, contractABI, provider);
 
       const info = await contract.getFullLinkInfo(suggestionId);
-      console.log("Contract Info:", info);
+      // console.log("Contract Info:", info);
 
       const encryptedTopicHex = info[1];
       const encryptedDescHex = info[2];
@@ -42,7 +43,7 @@ export default function PublicSuggestionPage() {
       const decryptedTopic = decryptFromBytes(secretKey, encryptedTopicHex);
       const decryptedDesc = decryptFromBytes(secretKey, encryptedDescHex);
 
-      console.log("Decrypted Topic:", decryptedTopic);
+      // console.log("Decrypted Topic:", decryptedTopic);
 
       setSuggestion({
         topic: decryptedTopic,
@@ -52,7 +53,11 @@ export default function PublicSuggestionPage() {
         isDeleted: info[5],
       });
     } catch (err) {
-      console.error("Error fetching link info:", err);
+      if (err instanceof Error) {
+        toast.error(err.message || "Error changing privacy");
+        } else {
+        toast.error("Unexpected error occurred");
+        }
     }
   };
 
@@ -89,7 +94,7 @@ export default function PublicSuggestionPage() {
 
       setFeedbacks(feedbacks);
     } catch (err) {
-      console.error("Error fetching feedbacks:", err);
+      toast.error("Error fetching feedbacks");
     } finally {
       setLoadingSuggestions(false);
     }
@@ -99,7 +104,7 @@ export default function PublicSuggestionPage() {
     fetchSuggestionById();
     fetchFeedbacks();
   }, []);
-  console.log(suggestionId);
+  // console.log(suggestionId);
 
   if (suggestion?.isPrivate) {
     router.push("/");

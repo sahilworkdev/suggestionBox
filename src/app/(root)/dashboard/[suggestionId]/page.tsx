@@ -25,6 +25,8 @@ import { Check, Copy } from "lucide-react";
 import MoreOptions from "@/components/dashboard/moreOptions";
 import { Skeleton } from "@/components/ui/skeleton";
 import FeedbackList from "@/components/dashboard/feedbackList";
+import CopyButton from "@/components/buttons/copyButton";
+import { toast } from "sonner";
 
 export default function SuggestionPage() {
   const { suggestionId } = useParams();
@@ -45,13 +47,13 @@ export default function SuggestionPage() {
 
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
-  const handleCopyLink = async (text: string) => {
-    await navigator.clipboard.writeText(text);
-    setCopied(true);
-    setTimeout(() => {
-      setCopied(false);
-    }, 2000);
-  };
+  // const handleCopyLink = async (text: string) => {
+  //   await navigator.clipboard.writeText(text);
+  //   setCopied(true);
+  //   setTimeout(() => {
+  //     setCopied(false);
+  //   }, 2000);
+  // };
 
   const fetchSuggestionById = async () => {
     try {
@@ -76,7 +78,8 @@ export default function SuggestionPage() {
         feedbackCount: Number(info[5]),
       });
     } catch (err) {
-      console.error("Error fetching link info:", err);
+      if(err instanceof Error)
+      toast.error("Error fetching suggestion info.");
     }
   };
 
@@ -105,14 +108,15 @@ export default function SuggestionPage() {
             author: feedbackSenders[index],
             timestamp: new Date(
               Number(timestamps[index]) * 1000
-            ).toLocaleString(), // already formatted for UI
+            ).toLocaleString(),
           };
         }
       );
 
       setFeedbacks(feedbacks);
     } catch (err) {
-      console.error("Error fetching feedbacks:", err);
+      if(err instanceof Error)
+      toast.error("Error fetching suggestions.");
     } finally {
       setLoadingFeedbacks(false);
     }
@@ -192,15 +196,16 @@ export default function SuggestionPage() {
             className="text-blue-500 text-sm truncate max-w-[30ch] md:max-w-[120ch]"
           >
             {suggestion.isActive
-              ? `${baseUrl}/${suggestionId}`
+              ? `${baseUrl}receive/${suggestionId}`
               : "The link has been deactivated!"}
           </Link>
-          <Button
+          {/* <Button
             variant={"ghost"}
             onClick={() => handleCopyLink(`${baseUrl}/${suggestionId}`)}
           >
             {copied ? <Check /> : <Copy />}
-          </Button>
+          </Button> */}
+          <CopyButton textToCopy={`${baseUrl}receive/${suggestionId}`}/>
         </div>
       )}
 

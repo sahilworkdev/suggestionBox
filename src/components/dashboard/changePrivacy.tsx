@@ -34,7 +34,7 @@ export default function ChangePrivacy({ suggestion }: { suggestion: string }) {
   const changePrivacy = async (isPrivate: boolean) => {
     try {
       if (!window.ethereum) {
-        console.error("No wallet found");
+        toast.error("No wallet found");
         return;
       }
 

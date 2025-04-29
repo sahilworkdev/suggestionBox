@@ -1,6 +1,6 @@
 "use client";
 import { useMetaMask } from "@/hooks/useMetaMask";
-import { ShinyButton } from "../magicui/shiny-button";
+import { ShinyButton } from "./shiny-button";
 import Image from "next/image";
 
 export default function ConnectButton() {
