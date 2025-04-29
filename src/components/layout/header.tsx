@@ -8,11 +8,14 @@ import { useEffect, useState } from "react";
 import { deleteCookie, getCookie, setCookie } from "cookies-next";
 import { Button } from "../ui/button";
 import { toast } from "sonner";
+import Image from "next/image";
 
 export default function Header() {
   const [user, setUser] = useState<string | null>(null);
   const { account, isConnected } = useMetaMask();
   const router = useRouter();
+
+  const [showProfile, setShowProfile] = useState(false);
 
   useEffect(() => {
     if (isConnected && account) {
@@ -41,7 +44,6 @@ export default function Header() {
       setUser(account);
     }
   }, [isConnected, account]);
-  
 
   // console.log(user);
   return (
@@ -58,23 +60,37 @@ export default function Header() {
           <nav className="flex items-center space-x-2">
             {!user && <ConnectButton />}
             {user && (
-              <div className="flex items-center gap-2">
-                <Button asChild variant={"ghost"}>
-                  <Link href={"/dashboard"}>Dashboard</Link>
-                </Button>
-                <span className="rounded-full px-4 py-2 bg-blue-600">
-                  {user}
-                </span>
+              <div className=" relative flex flex-col justify-end items-end">
+                <p onClick={() => setShowProfile(!showProfile)}>
+                  <Image width={20} height={20} src="/prof.svg" alt="prof" />
+                </p>
+                {/* {showProfile && (
+                  <p className="absolute top-6 right-0">
+                    erjkgnejirgnerognerogjneorng
+                  </p>
+                )} */}
+                {showProfile && (
+                  <div
+                    className={` absolute top-10 right-0 flex flex-col gap-2 border border-gray-800 rounded-md p-2 justify-start items-start bg-gray-800`}
+                  >
+                    <Button asChild variant={"ghost"}>
+                      <Link href={"/dashboard"}>Dashboard</Link>
+                    </Button>
+                    <span className="rounded-full px-4 py-2 bg-blue-600">
+                      {user}
+                    </span>
 
-                <Button
-                  size={"icon"}
-                  variant={"ghost"}
-                  className="cursor-pointer"
-                  type="button"
-                  onClick={disconnectWallet}
-                >
-                  <LogOut className="text-red-500" />
-                </Button>
+                    <Button
+                      size={"icon"}
+                      variant={"ghost"}
+                      className="cursor-pointer"
+                      type="button"
+                      onClick={disconnectWallet}
+                    >
+                      <LogOut className="text-red-500" />
+                    </Button>
+                  </div>
+                )}
               </div>
             )}
           </nav>
