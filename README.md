@@ -20,6 +20,8 @@ Suggestion Box is an open-source project designed to collect, manage, and organi
     ```bash
     cd suggestionbox
     ```
+4. Create .env.local and update it (.env.example)  
+ 
 3. Install dependencies:
     ```bash
     npm install
