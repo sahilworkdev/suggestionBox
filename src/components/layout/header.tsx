@@ -31,8 +31,17 @@ export default function Header() {
     toast.info(
       "To fully disconnect the waller, disconnect it from the browser also."
     );
+    setUser(null);
     router.push("/");
   };
+
+  useEffect(() => {
+    if (isConnected && account) {
+      setCookie("userAccount", account, { path: "/", maxAge: 60 * 60 * 24 });
+      setUser(account);
+    }
+  }, [isConnected, account]);
+  
 
   // console.log(user);
   return (
