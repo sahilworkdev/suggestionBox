@@ -61,9 +61,9 @@ export default function Header() {
           <nav className="flex items-center space-x-2">
             {!user && <ConnectButton />}
             {user && (
-              <div className=" relative flex flex-col justify-end items-end border rounded-full cursor-pointer hover:border-orange-600">
+              <div className=" relative flex flex-col justify-end items-end border border-white p-1 rounded-full cursor-pointer hover:border-orange-600">
                 <p onClick={() => setShowProfile(!showProfile)}>
-                  <Image width={20} height={20} src="/prof.svg" alt="prof" />
+                  <Image width={20} height={20} src="/prof.svg" alt="prof" className="rounded-full" />
                 </p>
 
                 {showProfile && (
