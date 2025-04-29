@@ -58,9 +58,17 @@ export default function CreateLinkForm() {
       toast.info("Topic must be at least 4 characters long.");
       return;
     }
+    if (!topic || topic.trim().length > 30) {
+      toast.info("Topic must be less than 30 characters.");
+      return;
+    }
 
     if (!desc || desc.trim().length < 12) {
       toast.info("Description must be at least 12 characters long.");
+      return;
+    }
+    if (!desc || desc.trim().length > 300) {
+      toast.info("Description must be less than 300 characters.");
       return;
     }
 
@@ -116,7 +124,7 @@ export default function CreateLinkForm() {
         throw new Error("Link ID not found in transaction logs.");
       }
 
-      const fullLink = `${baseUrl}/${actualLinkId}`;
+      const fullLink = `${baseUrl}/receive/${actualLinkId}`;
       // console.log(">>> Full link:", fullLink);
 
       setLatestSuggestion({
@@ -140,7 +148,7 @@ export default function CreateLinkForm() {
   return (
     <>
       {!latestSuggestion && (
-        <form className="flex flex-col justify-start items-start gap-4 sm:gap-6 w-full max-w-xl mx-auto">
+        <form className="flex flex-col justify-start items-start gap-4 sm:gap-6 w-full max-w-xl mx-auto px-4">
           <div className="flex flex-col items-start gap-2 w-full">
             <Label htmlFor="topic" className="text-lg font-medium">
               Topic
@@ -191,9 +199,10 @@ export default function CreateLinkForm() {
 
           <div className="w-full">
             <Button
-              className={"relative w-full font-semibold"}
+              className={"relative w-full font-semibold cursor-pointer"}
               onClick={generateLink}
               type="button"
+              disabled={pending}
             >
               <span className={pending ? "text-transparent" : ""}>
                 Generate Link
@@ -209,16 +218,16 @@ export default function CreateLinkForm() {
       )}
 
       {latestSuggestion && (
-        <div className="relative mt-8 p-4 border rounded bg-transparent  w-full max-w-xl mx-auto space-y-2">
+        <div className="relative mt-8 p-4 border rounded bg-transparent  w-full max-w-sm md:max-w-xl mx-auto space-y-2">
           <ShineBorder shineColor={["#A07CFE", "#FE8FB5", "#FFBE7B"]} />
           <h3 className="text-xl font-semibold text-center mb-4">
             Share the below link to start recieving suggestions
           </h3>
-          <div className="w-full flex flex-col justify-center items-center gap-1 mb-2">
-            <p className="font-semibold text-lg text-[#FFBE7B]">
+          <div className="w-full flex flex-col justify-center items-center gap-2 mb-4">
+            <p className="font-semibold text-lg text-[#FFBE7B] text-wrap">
               {latestSuggestion.topic}
             </p>
-            <p className="text-sm font-light">{latestSuggestion.description}</p>
+            <p className="text-sm font-light text-wrap">{latestSuggestion.description}</p>
           </div>
 
           <div className="w-full flex justify-center items-center gap-1">
@@ -226,7 +235,7 @@ export default function CreateLinkForm() {
               {latestSuggestion.link}
             </div>
             <div
-              className="border border-zinc-800 text-zinc-600 p-2 rounded"
+              className="border border-zinc-800 text-zinc-600 p-2 rounded cursor-pointer"
               onClick={() => handleCopyLink(latestSuggestion.link)}
             >
               {copied ? <Check /> : <Copy />}

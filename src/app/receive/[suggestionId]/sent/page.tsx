@@ -6,24 +6,23 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 export default function SendPage() {
-
   const router = useRouter();
   const goBack = () => {
     router.back();
   };
 
   return (
-    <div className="w-full">
+    <div className="w-full px-4">
       <div className="flex justify-center items-center my-20 max-w-md mx-auto">
         <div className="flex flex-col gap-4 items-center justify-center">
           <CheckCheckIcon className="w-8 h-auto" />
           <p className="text-xl font-medium text-center">
-            Your feedback has been sent successfully and{" "}
+            Your suggestion has been sent successfully and{" "}
             <strong>anonmously</strong>!
           </p>
           <div className="flex justify-center items-center flex-col md:flex-row gap-4">
             <Button asChild>
-              <Link href={"/"}>Generate Your Feedback Link</Link>
+              <Link href={"/"}>Generate Your Suggestion Link</Link>
             </Button>
             <Button variant={"outline"} onClick={goBack}>
               Send Another Message

@@ -50,9 +50,13 @@ export default function Header() {
             {!user && <ConnectButton />}
             {user && (
               <div className="flex items-center gap-2">
+                <Button asChild variant={"ghost"}>
+                  <Link href={"/dashboard"}>Dashboard</Link>
+                </Button>
                 <span className="rounded-full px-4 py-2 bg-blue-600">
                   {user}
                 </span>
+
                 <Button
                   size={"icon"}
                   variant={"ghost"}

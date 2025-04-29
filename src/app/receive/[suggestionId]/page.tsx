@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { cn, decryptFromBytes, encryptToBytes } from "@/lib/utils";
 import { getCookie } from "cookies-next";
 import { BrowserProvider, Contract } from "ethers";
+import { LoaderCircle } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -25,6 +26,7 @@ export default function ReceiveSuggestionPage() {
   const router = useRouter();
   const contractAddress = String(process.env.NEXT_PUBLIC_CONTRACT_ADDRESS);
   const secretKey = String(getCookie("userAccount"));
+  const [pending, setPending] = useState(false);
 
   const fetchSuggestionById = async () => {
     try {
@@ -64,6 +66,7 @@ export default function ReceiveSuggestionPage() {
 
   const submitFeedback = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+ 
 
     if (!suggestionId) {
       toast.info("Suggestion ID is missing.");
@@ -71,11 +74,17 @@ export default function ReceiveSuggestionPage() {
     }
 
     if (!feedbackContent || feedbackContent.trim().length < 5) {
-      toast.info("Feedback must be at least 5 characters long.");
+      toast.info("Suggestion must be at least 5 characters long.");
+      return;
+    }
+
+    if (feedbackContent.trim().length > 400) {
+      toast.info("Suggestion must be less than 400 characters.");
       return;
     }
 
     try {
+      setPending(true);
       const provider = new BrowserProvider(window.ethereum);
       const signer = await provider.getSigner();
       const contract = new Contract(contractAddress, contractABI, signer);
@@ -90,30 +99,32 @@ export default function ReceiveSuggestionPage() {
 
       const tx = await contract.submitFeedback(linkId, encryptedContentBytes);
       await tx.wait();
-      toast.success("Feedback submitted successfully!");
+      toast.success("Suggestion submitted successfully!");
       router.push(`${linkId}/sent`);
       setFeedbackContent("");
     } catch (err) {
       console.error(err);
-      toast.error("Failed to submit feedback!");
+      toast.error("Failed to submit suggestion!");
+    } finally {
+      setPending(false);
     }
   };
 
   console.log(suggestion);
   return (
-    <div className="container mx-auto py-10">
+    <div className="container mx-auto py-10 px-4">
       <form
         className="max-w-2xl mx-auto flex w-full flex-col gap-4"
         onSubmit={submitFeedback}
       >
-        <div className="text-xl font-semibold mt-6 sm:mt-8">
+        <div className="text-xl font-semibold mt-6 sm:mt-8 space-y-2 max-w-sm">
           <p>
             Send your feedback for :
-            <span className="text-brand font-bold italic">
-              {suggestion?.topic}
+            <span className="text-brand font-bold italic text-orange-600">
+              &nbsp; {suggestion?.topic}
             </span>
           </p>
-          <p className="text-sm">{suggestion?.description}</p>
+          <p className="text-sm font-normal">{suggestion?.description}</p>
         </div>
         <div className="flex sm:items-center gap-2 flex-col sm:flex-row items-start">
           <Badge
@@ -148,13 +159,24 @@ export default function ReceiveSuggestionPage() {
           placeholder="Enter suggestion..."
           name="feedback"
           id="feedback"
-          required
-          rows={5}
+  
+          rows={7}
           value={feedbackContent}
           onChange={(e) => setFeedbackContent(e.target.value)}
         />
-        <Button className="w-full px-4 py-2" type="submit">
-          Submit Suggestion
+        <Button
+          type="submit"
+          className={"relative w-full font-semibold cursor-pointer px-4 py-2"}
+          disabled={pending}
+        >
+          <span className={pending ? "text-transparent" : ""}>
+            Submit Suggestion
+          </span>
+          {pending && (
+            <span className="flex justify-center items-center absolute w-full h-full text-slate-400">
+              <LoaderCircle className="animate-spin" />
+            </span>
+          )}
         </Button>
       </form>
 
