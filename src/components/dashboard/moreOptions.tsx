@@ -53,7 +53,11 @@ export default function MoreOptions({ suggestion }: MoreOptionsProps) {
       toast.success("Link deleted successfully!");
       router.push('/dashboard')
     } catch (err) {
-      toast.error("Error deleting link:");
+      if (err instanceof Error) {
+        toast.error(err.message || "Error Deleting Suggestion");
+        } else {
+        toast.error("Unexpected error occurred");
+        }
     } finally {
       setLoading(false);
     }

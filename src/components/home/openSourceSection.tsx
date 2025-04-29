@@ -1,5 +1,3 @@
-import { Github } from "lucide-react";
-import { Button } from "../ui/button";
 import Link from "next/link";
 
 export default function OpenSourceSection() {

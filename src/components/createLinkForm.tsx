@@ -7,11 +7,11 @@ import { Check, Copy, LoaderCircle } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { ShineBorder } from "./magicui/shine-border";
-import { ethers } from "ethers";
+
 import { BrowserProvider, Contract } from "ethers";
 import { contractABI } from "@/abi";
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
-import CryptoJS from "crypto-js";
+
 import { getCookie } from "cookies-next";
 import { encryptToBytes } from "@/lib/utils";
 import { baseUrl } from "@/constants/data";
@@ -48,7 +48,6 @@ export default function CreateLinkForm() {
   const contractAddress = String(process.env.NEXT_PUBLIC_CONTRACT_ADDRESS);
 
   const secretKey = String(getCookie("userAccount"));
- 
 
   const generateLink = async () => {
     if (!window.ethereum) {
@@ -104,12 +103,13 @@ export default function CreateLinkForm() {
         try {
           const parsedLog = contract.interface.parseLog(log);
           if (parsedLog?.name === "LinkCreated") {
-      
-            actualLinkId = parsedLog?.args.linkId; 
+            actualLinkId = parsedLog?.args.linkId;
             break;
           }
         } catch (e) {
-          // not this contract's event, skip
+         if(e instanceof Error){
+          toast.error(e.message ||"Error Creating Link.")
+         }
         }
       }
 
@@ -118,7 +118,7 @@ export default function CreateLinkForm() {
       }
 
       const fullLink = `${baseUrl}/${actualLinkId}`;
-      console.log(">>> Full link:", fullLink);
+      // console.log(">>> Full link:", fullLink);
 
       setLatestSuggestion({
         topic: topic.trim(),

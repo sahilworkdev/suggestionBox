@@ -49,7 +49,11 @@ export default function ChangePrivacy({ suggestion }: { suggestion: string }) {
 
       toast.success("Privacy changed successfully!");
     } catch (err) {
-      toast.error("Error changing privacy");
+      if (err instanceof Error) {
+      toast.error(err.message || "Error changing privacy");
+      } else {
+      toast.error("Unexpected error occurred");
+      }
     } finally {
       setLoading(false);
     }

@@ -53,7 +53,11 @@ export default function ChangeStatus({ suggestion }: ChangeStatusProps) {
 
       toast.success("Status changed successfully!");
     } catch (err) {
-      toast.error("Error changing status:");
+      if (err instanceof Error) {
+        toast.error(err.message || "Error changing status");
+        } else {
+        toast.error("Unexpected error occurred");
+        }
     } finally {
       setLoading(false);
     }

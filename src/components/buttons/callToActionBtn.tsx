@@ -14,14 +14,18 @@ export default function CallToActionBtn() {
     const cookie = getCookie("userAccount") as string | null;
     setUser(cookie);
   }, []);
+
+  const handleCTAClick = () => {
+    if (user) {
+      router.push("/dashboard/create");
+    } else {
+      toast.info("Please connect your wallet first.");
+    }
+  };
   return (
     <InteractiveHoverButton
       className="h-11 px-8 border border-white"
-      onClick={() => {
-        user
-          ? router.push("/dashboard/create")
-          : toast.info("Please connect your wallet first.");
-      }}
+      onClick={handleCTAClick}
     >
       Start Collecting Suggestions
     </InteractiveHoverButton>
