@@ -78,8 +78,7 @@ export default function SuggestionPage() {
         feedbackCount: Number(info[5]),
       });
     } catch (err) {
-      if(err instanceof Error)
-      toast.error("Error fetching suggestion info.");
+      if (err instanceof Error) toast.error("Error fetching suggestion info.");
     }
   };
 
@@ -115,8 +114,7 @@ export default function SuggestionPage() {
 
       setFeedbacks(feedbacks);
     } catch (err) {
-      if(err instanceof Error)
-      toast.error("Error fetching suggestions.");
+      if (err instanceof Error) toast.error("Error fetching suggestions.");
     } finally {
       setLoadingFeedbacks(false);
     }
@@ -191,7 +189,7 @@ export default function SuggestionPage() {
       {suggestion && (
         <div className="flex justify-start items-center gap-2 my-5 px-4">
           <Link
-            href={`${baseUrl}/${suggestionId}` || "#"}
+            href={`${baseUrl}${suggestionId}` || "#"}
             target="_blank"
             className="text-blue-500 text-sm truncate max-w-[30ch] md:max-w-[120ch]"
           >
@@ -199,49 +197,10 @@ export default function SuggestionPage() {
               ? `${baseUrl}receive/${suggestionId}`
               : "The link has been deactivated!"}
           </Link>
-          {/* <Button
-            variant={"ghost"}
-            onClick={() => handleCopyLink(`${baseUrl}/${suggestionId}`)}
-          >
-            {copied ? <Check /> : <Copy />}
-          </Button> */}
           <CopyButton textToCopy={`${baseUrl}receive/${suggestionId}`}/>
         </div>
       )}
 
-      {/* Feedbacks Section */}
-      {/* <div className="px-4 mt-8">
-        <h2 className="text-xl font-bold mb-4">
-          Feedbacks ({loadingFeedbacks ? "..." : feedbacks.length})
-        </h2>
-
-        {loadingFeedbacks ? (
-          <div className="flex flex-col gap-4">
-            {Array.from({ length: 3 }).map((_, idx) => (
-              <Skeleton key={idx} className="h-24 w-full rounded-lg" />
-            ))}
-          </div>
-        ) : feedbacks.length === 0 ? (
-          <div className="flex flex-col items-center justify-center text-gray-400 py-10">
-            <p className="text-lg">No feedbacks yet!</p>
-          </div>
-        ) : (
-          <div className="flex flex-col gap-4">
-            {feedbacks.map((fb, idx) => (
-              <div
-                key={idx}
-                className="p-4 border border-gray-600 text-white rounded-lg shadow-sm bg-transparent"
-              >
-                <p className="">{fb.content}</p>
-                <div className="text-xs mt-2 flex justify-between">
-               
-                  <span>{fb.timestamp}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div> */}
       <FeedbackList feedbacks={feedbacks} loading={loadingFeedbacks} />
     </div>
   );
