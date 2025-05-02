@@ -36,15 +36,13 @@ export default function ReceiveSuggestionPage() {
       const contract = new Contract(contractAddress, contractABI, provider);
 
       const info = await contract.getFullLinkInfo(suggestionId);
-      console.log("Contract Info:", info);
 
+    //   console.log("Contract Info:", info[0]);
       const encryptedTopicHex = info[1];
       const encryptedDescHex = info[2];
 
       const decryptedTopic = decryptFromBytes(secretKey, encryptedTopicHex);
       const decryptedDesc = decryptFromBytes(secretKey, encryptedDescHex);
-
-      // console.log("Decrypted Topic:", decryptedTopic);
 
       setSuggestion({
         topic: decryptedTopic,
@@ -54,8 +52,7 @@ export default function ReceiveSuggestionPage() {
         isDeleted: info[5],
       });
     } catch (err) {
-      if(err instanceof Error)
-      toast.error("Error fetching suuggestion info.");
+      if (err instanceof Error) toast.error("Error fetching suuggestion info.");
     }
   };
 
@@ -63,11 +60,8 @@ export default function ReceiveSuggestionPage() {
     fetchSuggestionById();
   }, []);
 
-  // console.log(">>>", suggestion);
-
   const submitFeedback = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
- 
 
     if (!suggestionId) {
       toast.info("Suggestion ID is missing.");
@@ -104,10 +98,9 @@ export default function ReceiveSuggestionPage() {
       router.push(`${linkId}/sent`);
       setFeedbackContent("");
     } catch (err) {
-  
-    if(err instanceof Error){
-      toast.error("Failed to submit suggestion!");
-    }
+      if (err instanceof Error) {
+        toast.error("Failed to submit suggestion!");
+      }
     } finally {
       setPending(false);
     }
@@ -115,7 +108,7 @@ export default function ReceiveSuggestionPage() {
 
   console.log(suggestion);
   return (
-    <div className="container mx-auto py-10 px-4">
+    <div className="w-full max-w-[1300px] mx-auto mt-24 px-5">
       <form
         className="max-w-2xl mx-auto flex w-full flex-col gap-4"
         onSubmit={submitFeedback}
@@ -141,7 +134,10 @@ export default function ReceiveSuggestionPage() {
           <div>
             {!suggestion?.isPrivate && (
               <p>
-                <Link href={`/receive/#`} className="underline">
+                <Link
+                  href={`/receive/${suggestionId}/all-suggestions`}
+                  className="underline"
+                >
                   Click here
                 </Link>{" "}
                 to see others&apos; suggestions
@@ -162,7 +158,6 @@ export default function ReceiveSuggestionPage() {
           placeholder="Enter suggestion..."
           name="feedback"
           id="feedback"
-  
           rows={7}
           value={feedbackContent}
           onChange={(e) => setFeedbackContent(e.target.value)}

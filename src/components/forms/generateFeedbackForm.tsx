@@ -3,18 +3,19 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import {  LoaderCircle } from "lucide-react";
+import { LoaderCircle } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { ShineBorder } from "./magicui/shine-border";
+// import { ShineBorder } from "./magicui/shine-border";
 
 import { BrowserProvider, Contract } from "ethers";
 import { contractABI } from "@/abi";
-import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 
 import { getCookie } from "cookies-next";
 import { encryptToBytes } from "@/lib/utils";
-import CopyButton from "./buttons/copyButton";
+import { Card } from "../ui/card";
+import CopyButton from "../general/copyButton";
+import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 
 declare global {
   interface Window {
@@ -22,7 +23,7 @@ declare global {
   }
 }
 
-export default function CreateLinkForm() {
+export default function GenerateFeedbackForm() {
   const [pending, setPending] = useState(false);
   const [topic, setTopic] = useState("");
   const [desc, setDesc] = useState("");
@@ -149,7 +150,7 @@ export default function CreateLinkForm() {
   return (
     <>
       {!latestSuggestion && (
-        <form className="flex flex-col justify-start items-start gap-4 sm:gap-6 w-full max-w-xl mx-auto px-4">
+        <form className="flex flex-col justify-start items-start gap-4 sm:gap-6 w-full max-w-xl mx-auto px-4 mt-4">
           <div className="flex flex-col items-start gap-2 w-full">
             <Label htmlFor="topic" className="text-lg font-medium">
               Topic
@@ -219,20 +220,22 @@ export default function CreateLinkForm() {
       )}
 
       {latestSuggestion && (
-        <div className="relative mt-8 p-4 border rounded bg-transparent  w-full max-w-sm md:max-w-xl mx-auto space-y-2">
-          <ShineBorder shineColor={["#A07CFE", "#FE8FB5", "#FFBE7B"]} />
+        <Card className="w-full max-w-sm md:max-w-xl mx-auto space-y-2 mt-10 px-4">
+          {/* <ShineBorder shineColor={["#A07CFE", "#FE8FB5", "#FFBE7B"]} /> */}
           <h3 className="text-xl font-semibold text-center mb-4">
             Share the below link to start recieving suggestions
           </h3>
           <div className="w-full flex flex-col justify-center items-center gap-2 mb-4">
-            <p className="font-semibold text-lg text-[#FFBE7B] text-wrap">
+            <p className="font-semibold text-lg text-shadow-main-foreground text-wrap">
               {latestSuggestion.topic}
             </p>
-            <p className="text-sm font-light text-wrap">{latestSuggestion.description}</p>
+            <p className="text-sm text-main-foreground text-wrap">
+              {latestSuggestion.description}
+            </p>
           </div>
 
           <div className="w-full flex justify-center items-center gap-1">
-            <div className="p-[9px] bg-zinc-800 rounded text-ellipsis max-w-[150ch] truncate">
+            <div className="p-[9px] bg-main/50 rounded text-ellipsis max-w-[150ch] truncate">
               {latestSuggestion.link}
             </div>
             {/* <div
@@ -241,12 +244,10 @@ export default function CreateLinkForm() {
             >
               {copied ? <Check /> : <Copy />}
             </div> */}
-            <CopyButton textToCopy={latestSuggestion.link}/>
+            <CopyButton textToCopy={latestSuggestion.link} />
           </div>
-        </div>
+        </Card>
       )}
     </>
   );
 }
-
-// deploy commit

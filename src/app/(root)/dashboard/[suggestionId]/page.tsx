@@ -18,15 +18,20 @@ import { useEffect, useState } from "react";
 import { getCookie } from "cookies-next";
 import Link from "next/link";
 
-import { Button } from "@/components/ui/button";
+// import ChangePrivacy from "@/components/dashboard/changePrivacy";
+// import ChangeStatus from "@/components/dashboard/changeStatus";
+
+// import MoreOptions from "@/components/dashboard/moreOptions";
+import { Skeleton } from "@/components/ui/skeleton";
+// import FeedbackList from "@/components/dashboard/feedbackList";
+
+import { toast } from "sonner";
+import CopyButton from "@/components/general/copyButton";
+import FeedbackList from "@/components/dashboard/feedbackList";
+import ReloadButton from "@/components/general/reloadButton";
 import ChangePrivacy from "@/components/dashboard/changePrivacy";
 import ChangeStatus from "@/components/dashboard/changeStatus";
-import { Check, Copy } from "lucide-react";
 import MoreOptions from "@/components/dashboard/moreOptions";
-import { Skeleton } from "@/components/ui/skeleton";
-import FeedbackList from "@/components/dashboard/feedbackList";
-import CopyButton from "@/components/buttons/copyButton";
-import { toast } from "sonner";
 
 export default function SuggestionPage() {
   const { suggestionId } = useParams();
@@ -37,7 +42,7 @@ export default function SuggestionPage() {
     isPrivate: boolean;
     feedbackCount: number;
   } | null>(null);
-  const [copied, setCopied] = useState(false);
+
   const contractAddress = String(process.env.NEXT_PUBLIC_CONTRACT_ADDRESS);
   const secretKey = String(getCookie("userAccount"));
   const [feedbacks, setFeedbacks] = useState<
@@ -47,13 +52,7 @@ export default function SuggestionPage() {
 
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
-  // const handleCopyLink = async (text: string) => {
-  //   await navigator.clipboard.writeText(text);
-  //   setCopied(true);
-  //   setTimeout(() => {
-  //     setCopied(false);
-  //   }, 2000);
-  // };
+
 
   const fetchSuggestionById = async () => {
     try {
@@ -126,7 +125,7 @@ export default function SuggestionPage() {
   }, []);
 
   return (
-    <div className="container mx-auto py-10">
+    <div className="w-full max-w-[1300px] mx-auto mt-24 px-5">
       <div className="w-full px-4 mb-4">
         <Breadcrumb>
           <BreadcrumbList>
@@ -187,17 +186,20 @@ export default function SuggestionPage() {
 
       {/* Link Section */}
       {suggestion && (
-        <div className="flex justify-start items-center gap-2 my-5 px-4">
-          <Link
-            href={`${baseUrl}${suggestionId}` || "#"}
-            target="_blank"
-            className="text-blue-500 text-sm truncate max-w-[30ch] md:max-w-[120ch]"
-          >
-            {suggestion.isActive
-              ? `${baseUrl}receive/${suggestionId}`
-              : "The link has been deactivated!"}
-          </Link>
-          <CopyButton textToCopy={`${baseUrl}receive/${suggestionId}`}/>
+        // <div className="flex w-full justify-between items-center my-5 px-4">
+          <div className="flex justify-start items-center gap-2 px-4 my-5">
+            <Link
+              href={`${baseUrl}${suggestionId}` || "#"}
+              target="_blank"
+              className="text-main-foreground text-sm truncate max-w-[30ch] md:max-w-[50ch] bg-main/50 p-2 rounded"
+            >
+              {suggestion.isActive
+                ? `${baseUrl}receive/${suggestionId}`
+                : "The link has been deactivated!"}
+            </Link>
+            <CopyButton textToCopy={`${baseUrl}receive/${suggestionId}`} />
+          {/* </div> */}
+          {/* <ReloadButton /> */}
         </div>
       )}
 

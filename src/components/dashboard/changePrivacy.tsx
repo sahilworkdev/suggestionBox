@@ -50,9 +50,9 @@ export default function ChangePrivacy({ suggestion }: { suggestion: string }) {
       toast.success("Privacy changed successfully!");
     } catch (err) {
       if (err instanceof Error) {
-      toast.error(err.message || "Error changing privacy");
+        toast.error(err.message || "Error changing privacy");
       } else {
-      toast.error("Unexpected error occurred");
+        toast.error("Unexpected error occurred");
       }
     } finally {
       setLoading(false);
@@ -64,8 +64,8 @@ export default function ChangePrivacy({ suggestion }: { suggestion: string }) {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
-            variant={"outline"}
-            className="flex items-center gap-2 justify-center"
+            variant={"reverse"}
+            className="flex items-center gap-2 justify-center outline-none bg-main/50"
             disabled={loading}
           >
             {loading ? "Updating..." : "Change Privacy"}
@@ -73,11 +73,12 @@ export default function ChangePrivacy({ suggestion }: { suggestion: string }) {
           </Button>
         </DropdownMenuTrigger>
 
-        <DropdownMenuContent>
+        <DropdownMenuContent className="w-[156px] bg-main/50">
           {PRIVACY_OPTIONS.map((privacy) => (
             <DropdownMenuItem
               key={privacy.id}
               onClick={() => changePrivacy(privacy.value)}
+              className="bg-transparent"
             >
               <span className="capitalize">{privacy.name}</span>
             </DropdownMenuItem>

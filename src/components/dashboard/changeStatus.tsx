@@ -55,9 +55,9 @@ export default function ChangeStatus({ suggestion }: ChangeStatusProps) {
     } catch (err) {
       if (err instanceof Error) {
         toast.error(err.message || "Error changing status");
-        } else {
+      } else {
         toast.error("Unexpected error occurred");
-        }
+      }
     } finally {
       setLoading(false);
     }
@@ -68,8 +68,8 @@ export default function ChangeStatus({ suggestion }: ChangeStatusProps) {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
-            variant={"outline"}
-            className="flex items-center gap-2 justify-center"
+             variant={"reverse"}
+            className="flex items-center gap-2 justify-center outline-none bg-main/50"
             disabled={loading}
           >
             {loading ? "Updating..." : "Change Status"}
@@ -77,11 +77,12 @@ export default function ChangeStatus({ suggestion }: ChangeStatusProps) {
           </Button>
         </DropdownMenuTrigger>
 
-        <DropdownMenuContent>
+        <DropdownMenuContent className="w-[152px] bg-main/50">
           {STATUS_OPTIONS.map((status) => (
             <DropdownMenuItem
               key={status.id}
               onClick={() => changeStatus(status.value)}
+              className="bg-transparent"
             >
               <span className="capitalize">{status.name}</span>
             </DropdownMenuItem>

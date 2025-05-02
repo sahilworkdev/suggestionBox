@@ -12,7 +12,7 @@ export default function SendPage() {
   };
 
   return (
-    <div className="w-full px-4">
+    <div className="w-full max-w-[1300px] mx-auto mt-24 px-5">
       <div className="flex justify-center items-center my-20 max-w-md mx-auto">
         <div className="flex flex-col gap-4 items-center justify-center">
           <CheckCheckIcon className="w-8 h-auto" />
@@ -24,7 +24,7 @@ export default function SendPage() {
             <Button asChild>
               <Link href={"/"}>Generate Your Suggestion Link</Link>
             </Button>
-            <Button variant={"outline"} onClick={goBack}>
+            <Button variant={"neutral"} onClick={goBack} className="cursor-pointer">
               Send Another Message
             </Button>
           </div>

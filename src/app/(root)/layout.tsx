@@ -7,7 +7,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen grid grid-rows-[auto_1fr_auto]">
+    <div className="flex min-h-screen flex-col justify-between bg-background">
       <Header />
       {children}
       <Footer />

@@ -6,6 +6,11 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+export function truncateAddress(address: string): string {
+  if (!address) return "";
+  return `${address.slice(0, 6)}...${address.slice(-4)}`;
+}
+
 export const encryptToBytes = (secretKey: string, text: string): string => {
   const encrypted = CryptoJS.AES.encrypt(text, String(secretKey)).toString();
   return encrypted;
@@ -32,5 +37,3 @@ export const decryptFromBytes = (
   const decrypted = CryptoJS.AES.decrypt(base64String, String(secretKey));
   return decrypted.toString(CryptoJS.enc.Utf8);
 };
-
-

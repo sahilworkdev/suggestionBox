@@ -8,11 +8,10 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 
-export default function DashboardPage() {
+export default function Dashboard() {
   return (
-    <div className="container mx-auto py-10">
-     <div className="w-full px-4 mb-4">
-     <Breadcrumb>
+    <div className="w-full max-w-[1300px] mx-auto mt-24 px-5">
+      <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
             <BreadcrumbLink href="/">Home</BreadcrumbLink>
@@ -23,7 +22,6 @@ export default function DashboardPage() {
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
-     </div>
       <SuggestionsTable />
     </div>
   );

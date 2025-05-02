@@ -15,6 +15,7 @@ const CopyButton = ({ textToCopy, className = "" }: CopyButtonProps) => {
     try {
       await navigator.clipboard.writeText(textToCopy);
       setCopied(true);
+      toast.success("Copied to clipboard");
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
       toast.error("Failed to copy");
@@ -23,7 +24,9 @@ const CopyButton = ({ textToCopy, className = "" }: CopyButtonProps) => {
 
   return (
     <div
-      className={cn(`bg-transparent p-2 rounded cursor-pointer text-gray-400`, className)}
+      className={cn(`cursor-pointer`, className)}
+      // size="icon"
+      // variant="neutral"
       onClick={handleCopy}
     >
       {copied ? <Check /> : <Copy />}

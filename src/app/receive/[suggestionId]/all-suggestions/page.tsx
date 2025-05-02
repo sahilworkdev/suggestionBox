@@ -1,7 +1,6 @@
 "use client";
 import { contractABI } from "@/abi";
 import FeedbackList from "@/components/dashboard/feedbackList";
-import { Skeleton } from "@/components/ui/skeleton";
 import { decryptFromBytes } from "@/lib/utils";
 import { getCookie } from "cookies-next";
 import { BrowserProvider, Contract } from "ethers";
@@ -55,9 +54,9 @@ export default function PublicSuggestionPage() {
     } catch (err) {
       if (err instanceof Error) {
         toast.error(err.message || "Error changing privacy");
-        } else {
+      } else {
         toast.error("Unexpected error occurred");
-        }
+      }
     }
   };
 
@@ -110,7 +109,7 @@ export default function PublicSuggestionPage() {
     router.push("/");
   }
   return (
-    <div className="w-full container mx-auto py-10 px-4">
+    <div className="w-full max-w-[1300px] mx-auto mt-24 px-5">
       <div className="text-xl font-semibold mt-6 sm:mt-8 space-y-2 max-w-sm">
         <h1>All Suggestions For Topic : </h1>
         <p>

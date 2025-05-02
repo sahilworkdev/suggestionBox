@@ -1,5 +1,5 @@
 import Footer from "@/components/layout/footer";
-import { MessageCircleHeart } from "lucide-react";
+import { Mail } from "lucide-react";
 import Link from "next/link";
 
 export default function ReceiveLayout({
@@ -8,18 +8,19 @@ export default function ReceiveLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen grid grid-rows-[auto_1fr_auto]">
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-4 sm:px-0">
-        <div className="container flex h-16 items-center space-x-4 sm:justify-between sm:space-x-0 mx-auto">
-          <div className="flex gap-6 md:gap-10">
-            <Link href="/" className="flex items-center space-x-2">
-              <span className="font-bold flex items-center justify-center gap-1">
-                <MessageCircleHeart /> Suggestion Box
-              </span>
+    <div className="flex min-h-screen flex-col justify-between bg-background">
+      <nav className="fixed left-0 top-0 z-20 mx-auto flex h-[70px] w-full items-center border-b-4 border-border bg-background px-5">
+        <div className="mx-auto flex w-[1300px] text-foreground max-w-full items-center justify-between">
+          <div className="flex items-center xl:gap-10 gap-10">
+            <Link
+              className="text-[22px] px-2 rounded-base flex bg-main text-main-foreground border-2 border-black gap-1 items-center justify-center font-heading"
+              href={"/"}
+            >
+              <Mail className="size-5" /> <span>FydBox</span>
             </Link>
           </div>
         </div>
-      </header>
+      </nav>
       {children}
       <Footer />
     </div>

@@ -32,7 +32,7 @@ const contractAddress = String(process.env.NEXT_PUBLIC_CONTRACT_ADDRESS);
 
 export default function MoreOptions({ suggestion }: MoreOptionsProps) {
   const [loading, setLoading] = useState(false);
-  const router = useRouter()
+  const router = useRouter();
 
   const deleteLink = async () => {
     try {
@@ -51,13 +51,13 @@ export default function MoreOptions({ suggestion }: MoreOptionsProps) {
       await tx.wait();
 
       toast.success("Link deleted successfully!");
-      router.push('/dashboard')
+      router.push("/dashboard");
     } catch (err) {
       if (err instanceof Error) {
         toast.error(err.message || "Error Deleting Suggestion");
-        } else {
+      } else {
         toast.error("Unexpected error occurred");
-        }
+      }
     } finally {
       setLoading(false);
     }
@@ -67,14 +67,14 @@ export default function MoreOptions({ suggestion }: MoreOptionsProps) {
     <>
       <Dialog>
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant={"outline"}>
+          <DropdownMenuTrigger asChild className="bg-main/50">
+            <Button variant={"reverse"}>
               <span className="sr-only">More Options</span>
               <Ellipsis className="h-auto w-4" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuItem>
+          <DropdownMenuContent className="bg-main/50">
+            <DropdownMenuItem className="bg-transparent">
               <DialogTrigger asChild>
                 <button className="flex items-center justify-start gap-2 text-sm">
                   <Trash className="h-auto w-4" />
@@ -95,12 +95,12 @@ export default function MoreOptions({ suggestion }: MoreOptionsProps) {
           </DialogHeader>
           <DialogFooter>
             <DialogClose asChild>
-              <Button type="button" variant="secondary">
+              <Button type="button" variant="neutral">
                 Cancel
               </Button>
             </DialogClose>
             <Button
-              variant={"destructive"}
+              variant={"default"}
               onClick={deleteLink}
               disabled={loading}
             >

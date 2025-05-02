@@ -85,10 +85,10 @@ export default function SuggestionsTable() {
   }, []);
 
   return (
-    <div className="w-full container mx-auto px-4">
+    <div className="w-full container mx-auto px-4 mt-4">
       <div className="w-full flex justify-between items-baseline mb-4">
         <h2 className="text-2xl font-semibold">Your Suggestions</h2>
-        <Button variant="ghost">
+        <Button variant="neutral" className="w-max">
           <Link href="/dashboard/create" className="flex items-center gap-2">
             <PlusCircle className="w-4 h-auto" />
             Create
@@ -111,7 +111,7 @@ export default function SuggestionsTable() {
           <TableBody>
             {loading ? (
               // Loading Skeleton
-              Array.from({ length: 5 }).map((_, idx) => (
+              Array.from({ length: 10 }).map((_, idx) => (
                 <TableRow key={idx}>
                   <TableCell className="text-center">
                     <Skeleton className="h-4 w-4 mx-auto" />
@@ -186,14 +186,14 @@ export default function SuggestionsTable() {
                 </TableRow>
               ))
             ) : (
-              <TableRow>
+                <TableRow>
                 <TableCell colSpan={5} className="text-center py-20">
                   <div className="flex flex-col items-center justify-center gap-2 text-muted-foreground">
                     <span className="text-lg font-medium">
                       No suggestions found
                     </span>
                     <Link href="/dashboard/create">
-                      <Button variant="outline" className="mt-2 cursor-pointer">
+                      <Button  className="mt-2 cursor-pointer">
                         Create your first suggestion
                       </Button>
                     </Link>
